@@ -1,0 +1,8 @@
+ROBUST SCREENSHOT CAPTURE
+========================================
+Url: https://example.com
+Website_Type: standard
+Wait_Time: 3
+Timestamp: Sun Jul 20 19:06:35 2025
+Viewport: 1920x1080
+Capture_Method: robust_with_retries

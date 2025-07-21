@@ -1,0 +1,37 @@
+# Task ID: 8
+# Title: PDF Template Design
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Create the Google Slides template for Pain-Gap Audit PDFs with placeholder frames for dynamic content.
+# Details:
+Design one-page audit template in Google Slides. Include placeholder frames for: screenshot, logo, 3 bullet points (pain points), mock-up image. Ensure template is ready for Make.com automation. Create template with professional design and branding.
+
+# Test Strategy:
+Test template with sample content, verify all placeholders work correctly with Make.com. Test PDF export quality.
+
+# Subtasks:
+## 1. Design one-page audit template in Google Slides [pending]
+### Dependencies: None
+### Description: Create the base template structure for Pain-Gap Audit PDFs
+### Details:
+Design professional one-page layout, include all required sections, ensure proper spacing and branding
+
+## 2. Include placeholder frames for dynamic content [pending]
+### Dependencies: None
+### Description: Add placeholder frames for screenshot, logo, 3 bullet points, and mock-up image
+### Details:
+Create placeholder frames for: screenshot, logo, 3 bullet points (pain points), mock-up image
+
+## 3. Ensure template is ready for Make.com automation [pending]
+### Dependencies: None
+### Description: Configure template for seamless integration with Make.com automation
+### Details:
+Set up template with proper naming conventions, ensure placeholders are Make.com compatible
+
+## 4. Create template with professional design and branding [pending]
+### Dependencies: None
+### Description: Apply professional design principles and branding to the template
+### Details:
+Use consistent colors, fonts, spacing, add company branding, ensure professional appearance
+

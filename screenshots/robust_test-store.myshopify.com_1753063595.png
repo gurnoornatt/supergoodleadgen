@@ -1,0 +1,8 @@
+ROBUST SCREENSHOT CAPTURE
+========================================
+Url: https://test-store.myshopify.com
+Website_Type: ecommerce
+Wait_Time: 6
+Timestamp: Sun Jul 20 19:06:35 2025
+Viewport: 1920x1080
+Capture_Method: robust_with_retries

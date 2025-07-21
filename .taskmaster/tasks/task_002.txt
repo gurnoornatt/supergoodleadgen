@@ -1,0 +1,49 @@
+# Task ID: 2
+# Title: Lead Ingestion and Scraping System
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Implement the Google Maps scraping functionality using SerpApi to collect business listings from Central Valley cities.
+# Details:
+Create input system for business categories and cities. Implement SerpApi Google Maps Organic Results scraping with pagination handling. Extract Business Name, Website URL, Phone Number, Google Business Profile Link, Physical Address. Output to CSV/Google Sheets format. Handle rate limits and errors gracefully.
+
+# Test Strategy:
+Test scraping with sample categories and cities, verify all required fields are captured correctly. Test with different city/category combinations.
+
+# Subtasks:
+## 1. Create input system for business categories and cities [pending]
+### Dependencies: None
+### Description: Build system to accept and validate business categories and Central Valley cities
+### Details:
+Create input validation, define Central Valley city list, create category mapping system
+
+## 2. Implement SerpApi Google Maps scraping [pending]
+### Dependencies: None
+### Description: Build core scraping functionality using SerpApi for Google Maps Organic Results
+### Details:
+Integrate SerpApi, implement search queries, handle API responses, extract business data
+
+## 3. Extract required business data fields [pending]
+### Dependencies: None
+### Description: Extract Business Name, Website URL, Phone Number, Google Business Profile Link, Physical Address
+### Details:
+Parse API responses, validate data quality, handle missing fields gracefully
+
+## 4. Implement pagination handling [pending]
+### Dependencies: None
+### Description: Handle multiple pages of search results to get comprehensive business listings
+### Details:
+Implement page navigation, track progress, handle end of results gracefully
+
+## 5. Output data to CSV/Google Sheets format [pending]
+### Dependencies: None
+### Description: Format scraped data for output to CSV files and Google Sheets
+### Details:
+Create data formatting functions, implement CSV export, prepare Google Sheets upload format
+
+## 6. Handle rate limits and errors gracefully [pending]
+### Dependencies: None
+### Description: Implement error handling and rate limiting for SerpApi calls
+### Details:
+Add exponential backoff, error logging, retry logic for failed requests
+

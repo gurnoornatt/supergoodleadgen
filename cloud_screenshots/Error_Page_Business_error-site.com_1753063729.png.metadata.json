@@ -1,0 +1,11 @@
+{
+  "business_name": "Error Page Business",
+  "original_path": "screenshots/sample_error_page_business.png",
+  "upload_timestamp": 1753063729.061265,
+  "upload_time_iso": "2025-07-20 19:08:49",
+  "file_size": 416,
+  "cloud_provider": "aws_s3",
+  "bucket": "redflag-screenshots",
+  "region": "us-west-2",
+  "public_read": true
+}

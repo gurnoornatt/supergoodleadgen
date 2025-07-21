@@ -1,0 +1,963 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Setup and Environment Configuration",
+        "description": "Set up the development environment and configure all necessary API keys and dependencies for the Pain-Gap Audit Automation Script.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "Configure API keys for SerpApi, Google PageSpeed Insights API, BuiltWith API. Set up Python environment with required packages (requests, pandas, pillow, google-api-python-client). Configure Google Sheets API access. Set up cloud storage for PDFs. Create .env file for environment variables.",
+        "testStrategy": "Verify all API connections work and environment is ready for development. Test each API endpoint individually.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Python development environment",
+            "description": "Install Python and required packages (requests, pandas, pillow, google-api-python-client)",
+            "details": "Create virtual environment, install dependencies via pip, verify all packages are working correctly",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 2,
+            "title": "Configure API keys and environment variables",
+            "description": "Set up API keys for SerpApi, Google PageSpeed Insights API, BuiltWith API",
+            "details": "Create .env file, add all required API keys, test API connections individually",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 3,
+            "title": "Set up Google Sheets API access",
+            "description": "Configure Google Sheets API credentials and permissions",
+            "details": "Create Google Cloud project, enable Sheets API, create service account, download credentials",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 4,
+            "title": "Configure cloud storage for PDFs",
+            "description": "Set up cloud storage solution for storing generated PDFs",
+            "details": "Choose storage provider (Google Drive, AWS S3, etc.), configure access, test upload/download functionality",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Lead Ingestion and Scraping System",
+        "description": "Implement the Google Maps scraping functionality using SerpApi to collect business listings from Central Valley cities.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "details": "Create input system for business categories and cities. Implement SerpApi Google Maps Organic Results scraping with pagination handling. Extract Business Name, Website URL, Phone Number, Google Business Profile Link, Physical Address. Output to CSV/Google Sheets format. Handle rate limits and errors gracefully.",
+        "testStrategy": "Test scraping with sample categories and cities, verify all required fields are captured correctly. Test with different city/category combinations.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create input system for business categories and cities",
+            "description": "Build system to accept and validate business categories and Central Valley cities",
+            "details": "Create input validation, define Central Valley city list, create category mapping system",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 2,
+            "title": "Implement SerpApi Google Maps scraping",
+            "description": "Build core scraping functionality using SerpApi for Google Maps Organic Results",
+            "details": "Integrate SerpApi, implement search queries, handle API responses, extract business data",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 3,
+            "title": "Extract required business data fields",
+            "description": "Extract Business Name, Website URL, Phone Number, Google Business Profile Link, Physical Address",
+            "details": "Parse API responses, validate data quality, handle missing fields gracefully",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 4,
+            "title": "Implement pagination handling",
+            "description": "Handle multiple pages of search results to get comprehensive business listings",
+            "details": "Implement page navigation, track progress, handle end of results gracefully",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 5,
+            "title": "Output data to CSV/Google Sheets format",
+            "description": "Format scraped data for output to CSV files and Google Sheets",
+            "details": "Create data formatting functions, implement CSV export, prepare Google Sheets upload format",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 6,
+            "title": "Handle rate limits and errors gracefully",
+            "description": "Implement error handling and rate limiting for SerpApi calls",
+            "details": "Add exponential backoff, error logging, retry logic for failed requests",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Website Performance Analysis",
+        "description": "Implement PageSpeed Insights API integration to analyze mobile performance scores for scraped websites.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "details": "Integrate Google PageSpeed Insights API. Process each website URL from scraped data. Extract mobile performance score. Handle API rate limits with exponential backoff strategy. Log errors to 'Error Notes' column. Implement retry logic for failed requests.",
+        "testStrategy": "Test with sample websites, verify score extraction and error handling for failed API calls. Test rate limit handling.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate Google PageSpeed Insights API",
+            "description": "Set up PageSpeed Insights API integration and authentication",
+            "details": "Configure API credentials, test API connection, implement base API wrapper",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 2,
+            "title": "Process website URLs from scraped data",
+            "description": "Extract and validate website URLs from scraped business data",
+            "details": "Filter valid URLs, handle missing websites, prepare URL list for analysis",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 3,
+            "title": "Extract mobile performance scores",
+            "description": "Call PageSpeed Insights API and extract mobile performance scores",
+            "details": "Make API calls for each URL, parse response data, extract mobile score (0-100)",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 4,
+            "title": "Handle API rate limits with exponential backoff",
+            "description": "Implement rate limiting strategy for PageSpeed Insights API calls",
+            "details": "Add exponential backoff retry logic, respect API quotas, handle rate limit errors",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 5,
+            "title": "Log errors to 'Error Notes' column",
+            "description": "Track and log API errors and failures for analysis",
+            "details": "Create error logging system, categorize errors, add to Error Notes column in output",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 6,
+            "title": "Implement retry logic for failed requests",
+            "description": "Add retry mechanism for failed PageSpeed Insights API calls",
+            "details": "Implement retry with backoff, track failed URLs, provide fallback handling",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 3
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Technology Stack Analysis",
+        "description": "Implement BuiltWith API integration to determine technology age and stack information for scraped websites.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "details": "Integrate BuiltWith API. Process each website URL from scraped data. Extract technology stack information. Determine technology age and identify outdated technologies. Handle API rate limits and errors gracefully. Store tech stack data for scoring.",
+        "testStrategy": "Test with sample websites, verify technology stack extraction and error handling. Test with various technology stacks.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate BuiltWith API",
+            "description": "Set up BuiltWith API integration and authentication",
+            "details": "Configure API credentials, test API connection, implement base API wrapper",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 2,
+            "title": "Process website URLs for technology analysis",
+            "description": "Extract and validate website URLs for BuiltWith analysis",
+            "details": "Filter valid URLs, handle missing websites, prepare URL list for technology analysis",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 3,
+            "title": "Extract technology stack information",
+            "description": "Call BuiltWith API and extract detailed technology stack data",
+            "details": "Make API calls for each URL, parse response data, extract technology categories and versions",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 4,
+            "title": "Determine technology age and identify outdated technologies",
+            "description": "Analyze technology stack to identify outdated or problematic technologies",
+            "details": "Create technology age scoring system, identify outdated frameworks, flag problematic technologies",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 5,
+            "title": "Handle API rate limits and errors gracefully",
+            "description": "Implement error handling and rate limiting for BuiltWith API calls",
+            "details": "Add exponential backoff, error logging, retry logic for failed requests",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          },
+          {
+            "id": 6,
+            "title": "Store tech stack data for scoring",
+            "description": "Organize and store technology stack data for lead scoring analysis",
+            "details": "Create data structure for tech stack info, prepare data for scoring algorithm integration",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 4
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Lead Scoring and Classification",
+        "description": "Implement pain scoring logic to classify leads as 'RED' or 'GREEN' based on performance and technology criteria.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4
+        ],
+        "details": "Apply pain scoring algorithm. Tag leads as 'RED' if mobile speed score < 60/100. Add 'Status' column to lead list. Combine PageSpeed and BuiltWith data for comprehensive scoring. Consider technology age in scoring logic. Create scoring dashboard for analysis.",
+        "testStrategy": "Test scoring logic with sample data, verify correct classification of leads. Test edge cases and boundary conditions.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Apply pain scoring algorithm",
+            "description": "Implement the core pain scoring logic based on performance and technology criteria",
+            "details": "Create scoring algorithm, define scoring weights, implement calculation logic",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 2,
+            "title": "Tag leads as 'RED' or 'GREEN' based on mobile speed score",
+            "description": "Classify leads based on mobile performance score threshold (< 60/100 = RED)",
+            "details": "Implement classification logic, apply threshold rules, tag leads appropriately",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 3,
+            "title": "Add 'Status' column to lead list",
+            "description": "Create Status column in output data to track lead classification",
+            "details": "Add Status field to data structure, populate with RED/GREEN values, update output format",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 4,
+            "title": "Combine PageSpeed and BuiltWith data for comprehensive scoring",
+            "description": "Integrate performance and technology data for holistic lead scoring",
+            "details": "Merge data from both APIs, create unified scoring model, balance performance vs technology factors",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 5,
+            "title": "Consider technology age in scoring logic",
+            "description": "Factor in technology age and obsolescence in the scoring algorithm",
+            "details": "Weight older technologies higher in pain scoring, identify technology debt indicators",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          },
+          {
+            "id": 6,
+            "title": "Create scoring dashboard for analysis",
+            "description": "Build dashboard to visualize and analyze lead scoring results",
+            "details": "Create scoring analytics interface, display RED vs GREEN distribution, show scoring breakdowns",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 5
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Website Screenshot Capture",
+        "description": "Implement full-page screenshot functionality for 'RED' leads' current homepages.",
+        "status": "done",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "details": "Create screenshot capture system for 'RED' leads using Selenium or Playwright. Take full-page screenshots of business homepages. Handle various website layouts and loading times. Store screenshots in cloud storage. Implement screenshot quality validation.",
+        "testStrategy": "Test screenshot capture with sample 'RED' leads, verify quality and completeness. Test with various website types.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create screenshot capture system for 'RED' leads",
+            "description": "Build system to capture screenshots of 'RED' lead websites",
+            "details": "Implement screenshot capture logic, filter for RED leads only, create capture queue",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 2,
+            "title": "Take full-page screenshots of business homepages",
+            "description": "Capture complete webpage screenshots including below-the-fold content",
+            "details": "Implement full-page capture, handle dynamic content, ensure complete page capture",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 3,
+            "title": "Handle various website layouts and loading times",
+            "description": "Manage different website structures and loading scenarios",
+            "details": "Handle responsive layouts, wait for content loading, manage timeouts gracefully",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 4,
+            "title": "Store screenshots in cloud storage",
+            "description": "Save captured screenshots to cloud storage for later use",
+            "details": "Upload screenshots to cloud storage, organize by business name, create accessible URLs",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 5,
+            "title": "Implement screenshot quality validation",
+            "description": "Ensure captured screenshots meet quality standards",
+            "details": "Validate screenshot dimensions, check for errors, verify image quality and completeness",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Logo Extraction and Fallback System",
+        "description": "Implement logo extraction from business websites with fallback to generated text-based logos.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "details": "Extract business logo URLs from websites using web scraping techniques. Implement fallback system using Pillow (Python) to generate 400×120px colored rectangles with business name in 700-weight Poppins white text. Handle logo extraction failures gracefully. Create logo validation system.",
+        "testStrategy": "Test logo extraction with various website types, verify fallback system works correctly. Test with websites that have no logos.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extract business logo URLs from websites",
+            "description": "Implement web scraping to find and extract logo URLs from business websites",
+            "details": "Use web scraping techniques, search for logo elements, extract logo URLs and metadata",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          },
+          {
+            "id": 2,
+            "title": "Implement fallback system using Pillow",
+            "description": "Create fallback logo generation when logo extraction fails",
+            "details": "Use Pillow to generate 400×120px colored rectangles with business name in 700-weight Poppins white text",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          },
+          {
+            "id": 3,
+            "title": "Handle logo extraction failures gracefully",
+            "description": "Implement error handling for logo extraction process",
+            "details": "Detect extraction failures, trigger fallback system, log errors appropriately",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          },
+          {
+            "id": 4,
+            "title": "Create logo validation system",
+            "description": "Validate extracted and generated logos for quality and usability",
+            "details": "Check logo dimensions, format, quality, ensure logos are suitable for PDF generation",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 7
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "PDF Template Design",
+        "description": "Create the Google Slides template for Pain-Gap Audit PDFs with placeholder frames for dynamic content.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [],
+        "details": "Design one-page audit template in Google Slides. Include placeholder frames for: screenshot, logo, 3 bullet points (pain points), mock-up image. Ensure template is ready for Make.com automation. Create template with professional design and branding.",
+        "testStrategy": "Test template with sample content, verify all placeholders work correctly with Make.com. Test PDF export quality.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design one-page audit template in Google Slides",
+            "description": "Create the base template structure for Pain-Gap Audit PDFs",
+            "details": "Design professional one-page layout, include all required sections, ensure proper spacing and branding",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 2,
+            "title": "Include placeholder frames for dynamic content",
+            "description": "Add placeholder frames for screenshot, logo, 3 bullet points, and mock-up image",
+            "details": "Create placeholder frames for: screenshot, logo, 3 bullet points (pain points), mock-up image",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 3,
+            "title": "Ensure template is ready for Make.com automation",
+            "description": "Configure template for seamless integration with Make.com automation",
+            "details": "Set up template with proper naming conventions, ensure placeholders are Make.com compatible",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 4,
+            "title": "Create template with professional design and branding",
+            "description": "Apply professional design principles and branding to the template",
+            "details": "Use consistent colors, fonts, spacing, add company branding, ensure professional appearance",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 8
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Make.com Automation Setup",
+        "description": "Configure Make.com scenario to automate PDF generation from Google Sheets data.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "details": "Create 3-step Make.com scenario: 1) Watch for new 'RED' lead rows in Google Sheet, 2) Populate Google Slides template with dynamic data, 3) Export as PDF and save to Google Drive. Write public Drive link back to original sheet. Implement error handling in Make.com scenario.",
+        "testStrategy": "Test Make.com scenario with sample data, verify PDF generation and link writing works correctly. Test error handling.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create 3-step Make.com scenario",
+            "description": "Build the core Make.com automation workflow with 3 main steps",
+            "details": "Step 1: Watch for new 'RED' lead rows in Google Sheet, Step 2: Populate Google Slides template, Step 3: Export as PDF",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 2,
+            "title": "Watch for new 'RED' lead rows in Google Sheet",
+            "description": "Configure Make.com to monitor Google Sheet for new RED lead entries",
+            "details": "Set up Google Sheets trigger, filter for RED status, detect new rows automatically",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 3,
+            "title": "Populate Google Slides template with dynamic data",
+            "description": "Configure Make.com to fill template placeholders with lead data",
+            "details": "Map sheet data to template placeholders, populate screenshot, logo, bullet points, business info",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 4,
+            "title": "Export as PDF and save to Google Drive",
+            "description": "Configure PDF export and Google Drive storage in Make.com",
+            "details": "Export populated slides as PDF, save to Google Drive, organize by business name",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 5,
+            "title": "Write public Drive link back to original sheet",
+            "description": "Update Google Sheet with PDF link after generation",
+            "details": "Create public share link for PDF, write link back to original sheet row, track completion status",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          },
+          {
+            "id": 6,
+            "title": "Implement error handling in Make.com scenario",
+            "description": "Add error handling and logging to Make.com automation",
+            "details": "Add error handling for failed operations, implement retry logic, log errors appropriately",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 9
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Data Pipeline Integration",
+        "description": "Integrate all components to create the complete automated pipeline from scraping to PDF generation.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          6,
+          7,
+          9
+        ],
+        "details": "Connect Python script to write 'RED' lead data to dedicated Google Sheet. Ensure Make.com watches this sheet for new rows. Test complete pipeline from scraping to PDF generation. Implement error handling and logging throughout. Create monitoring dashboard.",
+        "testStrategy": "Run end-to-end test with sample data, verify complete automation works without manual intervention. Test error recovery.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Connect Python script to write 'RED' lead data to dedicated Google Sheet",
+            "description": "Integrate Python script output with Google Sheets for Make.com monitoring",
+            "details": "Configure Python script to write RED leads to specific Google Sheet, format data for Make.com consumption",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 2,
+            "title": "Ensure Make.com watches this sheet for new rows",
+            "description": "Configure Make.com trigger to monitor the dedicated Google Sheet",
+            "details": "Set up Make.com to watch specific sheet, detect new RED lead rows, trigger automation",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 3,
+            "title": "Test complete pipeline from scraping to PDF generation",
+            "description": "End-to-end testing of the complete automation pipeline",
+            "details": "Test full workflow: scraping → analysis → scoring → screenshot/logo → PDF generation → sheet update",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 4,
+            "title": "Implement error handling and logging throughout",
+            "description": "Add comprehensive error handling across all pipeline components",
+            "details": "Add error handling for each component, implement logging system, create error recovery procedures",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          },
+          {
+            "id": 5,
+            "title": "Create monitoring dashboard",
+            "description": "Build dashboard to monitor pipeline performance and status",
+            "details": "Create monitoring interface, track pipeline metrics, display system status and alerts",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 10
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Performance Optimization",
+        "description": "Optimize the system to process at least 200 leads per day and generate 50+ 'RED' audits.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "details": "Implement batch processing for API calls. Optimize database queries and data handling. Implement caching where appropriate. Monitor and optimize performance bottlenecks. Ensure cost per 'RED' lead stays under $0.50. Implement parallel processing where possible.",
+        "testStrategy": "Load test with 200+ leads, verify performance targets are met and costs are within budget. Monitor resource usage.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement batch processing for API calls",
+            "description": "Optimize API calls by processing leads in batches",
+            "details": "Group API calls into batches, implement batch processing logic, optimize API usage",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          },
+          {
+            "id": 2,
+            "title": "Optimize database queries and data handling",
+            "description": "Improve data processing efficiency and reduce bottlenecks",
+            "details": "Optimize data queries, implement efficient data structures, reduce memory usage",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          },
+          {
+            "id": 3,
+            "title": "Implement caching where appropriate",
+            "description": "Add caching mechanisms to reduce redundant API calls and improve performance",
+            "details": "Cache API responses, implement cache invalidation, optimize cache hit rates",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          },
+          {
+            "id": 4,
+            "title": "Monitor and optimize performance bottlenecks",
+            "description": "Identify and resolve performance bottlenecks in the system",
+            "details": "Profile system performance, identify slow components, implement optimizations",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          },
+          {
+            "id": 5,
+            "title": "Ensure cost per 'RED' lead stays under $0.50",
+            "description": "Monitor and optimize costs to meet budget requirements",
+            "details": "Track API costs, optimize usage, implement cost controls, monitor cost per lead",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          },
+          {
+            "id": 6,
+            "title": "Implement parallel processing where possible",
+            "description": "Add parallel processing to improve throughput and reduce processing time",
+            "details": "Implement concurrent API calls, parallel data processing, optimize for multi-core systems",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Error Handling and Reliability",
+        "description": "Implement comprehensive error handling and logging throughout the system.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "details": "Add error handling for failed API calls, missing websites, broken URLs. Implement exponential backoff for rate limits. Create comprehensive logging system. Add 'Error Notes' column to track issues. Ensure system doesn't crash on errors. Implement alerting for critical failures.",
+        "testStrategy": "Test with intentionally broken data, verify error handling works and system remains stable. Test recovery procedures.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Add error handling for failed API calls",
+            "description": "Implement comprehensive error handling for all API interactions",
+            "details": "Handle API failures, implement retry logic, log errors appropriately, provide fallback options",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 2,
+            "title": "Handle missing websites and broken URLs",
+            "description": "Implement error handling for invalid or missing website URLs",
+            "details": "Validate URLs, handle missing websites, implement fallback for broken links",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 3,
+            "title": "Implement exponential backoff for rate limits",
+            "description": "Add intelligent retry logic with exponential backoff for rate-limited APIs",
+            "details": "Implement exponential backoff algorithm, respect rate limits, handle quota exhaustion",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 4,
+            "title": "Create comprehensive logging system",
+            "description": "Implement detailed logging throughout the system for debugging and monitoring",
+            "details": "Add structured logging, log levels, log rotation, centralize log management",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 5,
+            "title": "Add 'Error Notes' column to track issues",
+            "description": "Create Error Notes column in output data to track and categorize errors",
+            "details": "Add Error Notes field, categorize errors, provide actionable error information",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 6,
+            "title": "Ensure system doesn't crash on errors",
+            "description": "Implement graceful error handling to prevent system crashes",
+            "details": "Add try-catch blocks, implement error recovery, ensure system stability",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          },
+          {
+            "id": 7,
+            "title": "Implement alerting for critical failures",
+            "description": "Set up alerting system for critical system failures",
+            "details": "Configure alerts for critical errors, implement notification system, set up monitoring thresholds",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 12
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Deployment and Hosting Setup",
+        "description": "Deploy the system to a low-cost cloud hosting solution with scheduled execution.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12
+        ],
+        "details": "Choose hosting solution (DigitalOcean Droplet, Heroku Hobby Dyno, AWS Lambda, or Google Cloud Functions). Set up cron job for scheduled execution. Configure environment variables and secrets. Implement monitoring and alerting. Set up backup and recovery procedures.",
+        "testStrategy": "Deploy to staging environment, verify scheduled execution works correctly. Test monitoring and alerting systems.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Choose hosting solution",
+            "description": "Select appropriate cloud hosting solution for the automation system",
+            "details": "Evaluate DigitalOcean Droplet, Heroku Hobby Dyno, AWS Lambda, Google Cloud Functions for cost and performance",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 2,
+            "title": "Set up cron job for scheduled execution",
+            "description": "Configure automated scheduling for the lead processing pipeline",
+            "details": "Set up cron job, configure execution schedule, ensure reliable automated runs",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 3,
+            "title": "Configure environment variables and secrets",
+            "description": "Set up secure environment configuration for production deployment",
+            "details": "Configure production environment variables, secure API keys, set up secrets management",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 4,
+            "title": "Implement monitoring and alerting",
+            "description": "Set up system monitoring and alerting for production deployment",
+            "details": "Configure monitoring tools, set up alerts, implement health checks, track system performance",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 5,
+            "title": "Set up backup and recovery procedures",
+            "description": "Implement backup and disaster recovery for the production system",
+            "details": "Configure automated backups, implement recovery procedures, test backup restoration",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "VA Handoff System",
+        "description": "Create clean, simple output system for Virtual Assistant to use without technical interpretation.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "details": "Design final Google Sheet output format for VA. Include all necessary information for follow-up calls. Ensure PDF links are easily accessible. Create simple instructions for VA usage. Test with VA to ensure usability. Implement VA training materials.",
+        "testStrategy": "Have VA test the system, verify they can easily use the output to book '$1 demos'. Test with multiple VA scenarios.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design final Google Sheet output format for VA",
+            "description": "Create clean, simple output format for Virtual Assistant use",
+            "details": "Design sheet layout, include all necessary information, ensure easy readability for VA",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 2,
+            "title": "Include all necessary information for follow-up calls",
+            "description": "Ensure sheet contains all data needed for VA to conduct follow-up calls",
+            "details": "Include business details, contact info, pain points, PDF links, call notes section",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 3,
+            "title": "Ensure PDF links are easily accessible",
+            "description": "Make PDF audit links prominent and easily accessible for VA",
+            "details": "Create dedicated PDF link column, ensure links are clickable, add link validation",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 4,
+            "title": "Create simple instructions for VA usage",
+            "description": "Develop clear, simple instructions for VA to use the system",
+            "details": "Create step-by-step instructions, include troubleshooting tips, make instructions non-technical",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 5,
+            "title": "Test with VA to ensure usability",
+            "description": "Have VA test the system and provide feedback on usability",
+            "details": "Conduct VA testing sessions, gather feedback, iterate on design based on VA input",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 6,
+            "title": "Implement VA training materials",
+            "description": "Create comprehensive training materials for VA onboarding",
+            "details": "Create training videos, documentation, FAQs, troubleshooting guides for VA team",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Documentation and Training",
+        "description": "Create comprehensive documentation and training materials for system maintenance and usage.",
+        "status": "pending",
+        "priority": "low",
+        "dependencies": [
+          13,
+          14
+        ],
+        "details": "Create technical documentation for system maintenance. Create user guides for VA and agency owner. Document API configurations and troubleshooting steps. Create runbooks for common issues. Train team on system usage. Create video tutorials if needed.",
+        "testStrategy": "Review documentation with team, verify all procedures are clear and complete. Test documentation with new team members.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create technical documentation for system maintenance",
+            "description": "Develop comprehensive technical documentation for system maintenance",
+            "details": "Create system architecture docs, API documentation, deployment guides, troubleshooting procedures",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          },
+          {
+            "id": 2,
+            "title": "Create user guides for VA and agency owner",
+            "description": "Develop user-friendly guides for different user roles",
+            "details": "Create VA user guide, agency owner guide, role-specific instructions and workflows",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          },
+          {
+            "id": 3,
+            "title": "Document API configurations and troubleshooting steps",
+            "description": "Create detailed API documentation and troubleshooting guides",
+            "details": "Document API setup, configuration steps, common issues, troubleshooting procedures",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          },
+          {
+            "id": 4,
+            "title": "Create runbooks for common issues",
+            "description": "Develop step-by-step runbooks for resolving common system issues",
+            "details": "Create runbooks for API failures, data issues, PDF generation problems, system errors",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          },
+          {
+            "id": 5,
+            "title": "Train team on system usage",
+            "description": "Conduct training sessions for team members on system usage",
+            "details": "Schedule training sessions, create training materials, conduct hands-on workshops",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          },
+          {
+            "id": 6,
+            "title": "Create video tutorials if needed",
+            "description": "Develop video tutorials for complex system operations",
+            "details": "Create screen recordings, voice-over tutorials, step-by-step video guides",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 15
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "projectName": "Pain-Gap Audit Automation Script",
+      "version": "1.0-Final",
+      "created": "2024-01-27",
+      "lastModified": "2024-01-27",
+      "description": "Automated script to identify and qualify small business sales leads in California's Central Valley, generating personalized Pain-Gap Audit PDFs at scale.",
+      "updated": "2025-07-21T02:09:07.899Z"
+    }
+  }
+}

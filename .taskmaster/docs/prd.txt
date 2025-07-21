@@ -1,0 +1,76 @@
+# Pain-Gap Audit Automation Script
+## Project Name: Project Central Valley Blitz
+### Version: 1.0-Final
+### Date: October 26, 2023
+### Status: Locked for Development
+
+## 1. Overview & Business Goal
+This document outlines the requirements for an automated script designed to identify and qualify small business sales leads in California's Central Valley. The primary business goal is to generate a high-volume list of qualified, "pain-aware" leads to fuel a 90-day web design sales campaign. The script will serve as the engine for Phase 0 of the campaign, creating personalized "Pain-Gap Audit" PDFs at scale.
+
+## 2. Target User & Persona
+- **Primary User**: The Agency Owner (You)
+- **Secondary User**: The Virtual Assistant (VA)
+
+## 3. Functional Requirements (User Stories)
+
+### EPIC 1: Lead Ingestion & Scraping
+**User Story 1.1**: As the Agency Owner, I want to define a list of business categories and cities.
+**User Story 1.2**: As the Agency Owner, I want the script to use these inputs to scrape Google Maps for business listings.
+
+**Acceptance Criteria**:
+- The script must retrieve: Business Name, Website URL, Phone Number, Google Business Profile (GBP) Link, Physical Address.
+- The output should be a clean CSV or Google Sheet.
+
+### EPIC 2: Lead Analysis & Scoring
+**User Story 2.1**: As the Agency Owner, I want the script to process each scraped website through the Google PageSpeed Insights API to get its mobile performance score.
+**User Story 2.2**: As the Agency Owner, I want the script to process each website through the BuiltWith API to determine its technology age.
+**User Story 2.3**: As the Agency Owner, I want the script to apply a "Pain Score" and tag leads as "RED" if their mobile speed score is less than 60/100.
+
+**Acceptance Criteria**:
+- The script must make successful API calls to both PageSpeed and BuiltWith.
+- It must correctly parse the mobile score and tech stack.
+- A "Status" column will be added to the lead list, populated with "RED" or "GREEN."
+
+### EPIC 3: Automated Audit Generation
+**User Story 3.1**: For every "RED" lead, I want the script to automatically generate a one-page PDF audit.
+
+**Acceptance Criteria**:
+- The script must take a full-page screenshot of the business's current homepage.
+- The script must programmatically trigger the population of a pre-designed PDF template.
+- **Logo Extraction & Fallback**: The script will attempt to extract the business's logo URL. If logo extraction fails, use the business name in 700-weight Poppins white text on a colored rectangle generated programmatically via Pillow (Python), sized 400×120 px.
+- **Dynamic Fields**: The following fields will be dynamically inserted: Screenshot, Logo (or generated fallback), Business Name, Pain Points (Mobile Score, Tech Stack, CTA), and the business logo/name will be overlaid on the static mock-up image.
+- Each generated PDF must be saved to a cloud storage location, and the public URL of the PDF must be added back to the master spreadsheet.
+
+## 4. Non-Functional Requirements
+- **Performance**: The script must be able to process at least 200 leads per day to generate the target of 50+ "RED" audits.
+- **Cost ("Fresno Budget")**: The solution must prioritize low-cost tools (SerpApi, Make.com, etc.).
+- **Reliability**: The script must include error handling for failed API calls, missing websites, or broken URLs, and log these errors without crashing.
+- **[V1.0-FINAL EDIT - Optional Polish] Rate-Limit Retry**: Implement an exponential back-off strategy on PageSpeed API 429 Too Many Requests errors; log failures to a new Sheet column named 'Error Notes'.
+- **Usability**: The final output (the Google Sheet for the VA) must be clean, simple, and require no technical interpretation.
+
+## 5. Technical Stack & Implementation Plan
+- **Scraping**: SerpApi Google Maps Organic Results. This is the primary method. It handles pagination and returns clean JSON with all required fields. It offers a free tier (100 searches/day) and is cost-effective at scale (~$0.002 per result).
+- **Orchestration & Logic**: A Python script to serve as the central "brain." It will ingest the scraped data, call the PageSpeed and BuiltWith APIs, perform the scoring logic, and write the "RED" leads to the master Google Sheet.
+- **APIs**:
+  - SerpApi: For Google Maps scraping.
+  - Google PageSpeed Insights API: Free.
+  - BuiltWith API: Free tier for initial testing; paid plan for scale.
+- **PDF Generation (v1 only)**: Semi-Automated Path is Primary.
+  - The Python script writes "RED" lead data rows to a dedicated Google Sheet.
+  - A Make.com scenario (3-step) watches for new rows in this sheet.
+  - The scenario populates a pre-designed Google Slides template (where one slide = one audit page). The template will contain placeholder frames for the screenshot, logo, 3 bullet points, and the mock-up.
+  - Make.com then exports the populated slide as a PDF, saves it to a specific Google Drive folder, and writes the public Drive link back into the original Google Sheet row.
+- **Data Storage**: Google Sheets.
+- **Hosting**: A scheduled job (cron job) on a low-cost cloud server (DigitalOcean Droplet, Heroku Hobby Dyno) or a serverless function (AWS Lambda, Google Cloud Functions).
+
+## 6. Assumptions & Dependencies
+- We have active API keys for SerpApi and BuiltWith.
+- A budget for these services is approved.
+- The one-page audit template is designed and exists as a Google Slide.
+- The one-page website mock-up image is created and available.
+
+## 7. Success Metrics
+- **Output**: ≥ 50 "RED" lead audit PDFs generated per day.
+- **Cost**: Cost per generated "RED" lead is under $0.50.
+- **Efficiency**: The entire process, from scraping to VA handoff, is automated via the Script-to-Make.com workflow.
+- **Business Impact**: The VA is able to book at least 5 "$1 demos" per day from the generated list. 

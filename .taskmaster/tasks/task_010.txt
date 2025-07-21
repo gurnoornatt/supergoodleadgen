@@ -1,0 +1,43 @@
+# Task ID: 10
+# Title: Data Pipeline Integration
+# Status: pending
+# Dependencies: 6, 7, 9
+# Priority: high
+# Description: Integrate all components to create the complete automated pipeline from scraping to PDF generation.
+# Details:
+Connect Python script to write 'RED' lead data to dedicated Google Sheet. Ensure Make.com watches this sheet for new rows. Test complete pipeline from scraping to PDF generation. Implement error handling and logging throughout. Create monitoring dashboard.
+
+# Test Strategy:
+Run end-to-end test with sample data, verify complete automation works without manual intervention. Test error recovery.
+
+# Subtasks:
+## 1. Connect Python script to write 'RED' lead data to dedicated Google Sheet [pending]
+### Dependencies: None
+### Description: Integrate Python script output with Google Sheets for Make.com monitoring
+### Details:
+Configure Python script to write RED leads to specific Google Sheet, format data for Make.com consumption
+
+## 2. Ensure Make.com watches this sheet for new rows [pending]
+### Dependencies: None
+### Description: Configure Make.com trigger to monitor the dedicated Google Sheet
+### Details:
+Set up Make.com to watch specific sheet, detect new RED lead rows, trigger automation
+
+## 3. Test complete pipeline from scraping to PDF generation [pending]
+### Dependencies: None
+### Description: End-to-end testing of the complete automation pipeline
+### Details:
+Test full workflow: scraping → analysis → scoring → screenshot/logo → PDF generation → sheet update
+
+## 4. Implement error handling and logging throughout [pending]
+### Dependencies: None
+### Description: Add comprehensive error handling across all pipeline components
+### Details:
+Add error handling for each component, implement logging system, create error recovery procedures
+
+## 5. Create monitoring dashboard [pending]
+### Dependencies: None
+### Description: Build dashboard to monitor pipeline performance and status
+### Details:
+Create monitoring interface, track pipeline metrics, display system status and alerts
+

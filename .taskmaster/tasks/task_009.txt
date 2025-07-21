@@ -1,0 +1,49 @@
+# Task ID: 9
+# Title: Make.com Automation Setup
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Configure Make.com scenario to automate PDF generation from Google Sheets data.
+# Details:
+Create 3-step Make.com scenario: 1) Watch for new 'RED' lead rows in Google Sheet, 2) Populate Google Slides template with dynamic data, 3) Export as PDF and save to Google Drive. Write public Drive link back to original sheet. Implement error handling in Make.com scenario.
+
+# Test Strategy:
+Test Make.com scenario with sample data, verify PDF generation and link writing works correctly. Test error handling.
+
+# Subtasks:
+## 1. Create 3-step Make.com scenario [pending]
+### Dependencies: None
+### Description: Build the core Make.com automation workflow with 3 main steps
+### Details:
+Step 1: Watch for new 'RED' lead rows in Google Sheet, Step 2: Populate Google Slides template, Step 3: Export as PDF
+
+## 2. Watch for new 'RED' lead rows in Google Sheet [pending]
+### Dependencies: None
+### Description: Configure Make.com to monitor Google Sheet for new RED lead entries
+### Details:
+Set up Google Sheets trigger, filter for RED status, detect new rows automatically
+
+## 3. Populate Google Slides template with dynamic data [pending]
+### Dependencies: None
+### Description: Configure Make.com to fill template placeholders with lead data
+### Details:
+Map sheet data to template placeholders, populate screenshot, logo, bullet points, business info
+
+## 4. Export as PDF and save to Google Drive [pending]
+### Dependencies: None
+### Description: Configure PDF export and Google Drive storage in Make.com
+### Details:
+Export populated slides as PDF, save to Google Drive, organize by business name
+
+## 5. Write public Drive link back to original sheet [pending]
+### Dependencies: None
+### Description: Update Google Sheet with PDF link after generation
+### Details:
+Create public share link for PDF, write link back to original sheet row, track completion status
+
+## 6. Implement error handling in Make.com scenario [pending]
+### Dependencies: None
+### Description: Add error handling and logging to Make.com automation
+### Details:
+Add error handling for failed operations, implement retry logic, log errors appropriately
+

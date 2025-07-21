@@ -1,0 +1,49 @@
+# Task ID: 5
+# Title: Lead Scoring and Classification
+# Status: pending
+# Dependencies: 3, 4
+# Priority: high
+# Description: Implement pain scoring logic to classify leads as 'RED' or 'GREEN' based on performance and technology criteria.
+# Details:
+Apply pain scoring algorithm. Tag leads as 'RED' if mobile speed score < 60/100. Add 'Status' column to lead list. Combine PageSpeed and BuiltWith data for comprehensive scoring. Consider technology age in scoring logic. Create scoring dashboard for analysis.
+
+# Test Strategy:
+Test scoring logic with sample data, verify correct classification of leads. Test edge cases and boundary conditions.
+
+# Subtasks:
+## 1. Apply pain scoring algorithm [pending]
+### Dependencies: None
+### Description: Implement the core pain scoring logic based on performance and technology criteria
+### Details:
+Create scoring algorithm, define scoring weights, implement calculation logic
+
+## 2. Tag leads as 'RED' or 'GREEN' based on mobile speed score [pending]
+### Dependencies: None
+### Description: Classify leads based on mobile performance score threshold (< 60/100 = RED)
+### Details:
+Implement classification logic, apply threshold rules, tag leads appropriately
+
+## 3. Add 'Status' column to lead list [pending]
+### Dependencies: None
+### Description: Create Status column in output data to track lead classification
+### Details:
+Add Status field to data structure, populate with RED/GREEN values, update output format
+
+## 4. Combine PageSpeed and BuiltWith data for comprehensive scoring [pending]
+### Dependencies: None
+### Description: Integrate performance and technology data for holistic lead scoring
+### Details:
+Merge data from both APIs, create unified scoring model, balance performance vs technology factors
+
+## 5. Consider technology age in scoring logic [pending]
+### Dependencies: None
+### Description: Factor in technology age and obsolescence in the scoring algorithm
+### Details:
+Weight older technologies higher in pain scoring, identify technology debt indicators
+
+## 6. Create scoring dashboard for analysis [pending]
+### Dependencies: None
+### Description: Build dashboard to visualize and analyze lead scoring results
+### Details:
+Create scoring analytics interface, display RED vs GREEN distribution, show scoring breakdowns
+
