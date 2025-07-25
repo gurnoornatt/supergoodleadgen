@@ -3,7 +3,7 @@
 ## Current Status
 - **Date**: 2025-07-25
 - **Current Task**: Task 4 - Gym-Specific Pain Scoring Algorithm
-- **Current Subtask**: 4.2 - Create gym size and model-specific scoring
+- **Current Subtask**: 4.3 - Implement gym-specific RED/GREEN classification
 
 ## Completed Tasks
 1. ✅ Task 1: Update Lead Scraping for Gym Categories
@@ -14,11 +14,12 @@
    - ✅ Subtask 3.3: Develop digital infrastructure scoring
 4. 🔄 Task 4: Gym-Specific Pain Scoring Algorithm (IN PROGRESS)
    - ✅ Subtask 4.1: Define gym-specific pain factors
+   - ✅ Subtask 4.2: Create gym size and model-specific scoring
 
 ## Architecture Overview
 - **lead_processor.py**: Core lead processing engine with all analysis methods
 - **gym_software_database.py**: Gym software detection patterns and metadata
-- **Test Suite**: Comprehensive tests for each component (48 tests passing)
+- **Test Suite**: Comprehensive tests for each component (60 tests passing)
 
 ## Key Components Implemented
 1. **Gym Category Detection**: Identifies gym types (fitness, yoga, martial arts, etc.)
@@ -32,6 +33,11 @@
    - Competitive Disadvantages (20% weight)
    - Revenue Loss Factors (15% weight)
    - Growth Limitations (10% weight)
+7. **Gym Size & Model-Specific Scoring**: Adjusts pain scores based on:
+   - Gym size multipliers (Large: 1.2x, Medium: 1.0x, Small: 0.8x)
+   - Business model multipliers (Boutique: 1.3x, CrossFit: 1.2x, Personal Training: 0.7x, etc.)
+   - Critical threshold violations based on gym size
+   - Size and model-specific pain factors
 
 ## Next Steps
 ### Task 4: Gym-Specific Pain Scoring Algorithm

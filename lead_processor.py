@@ -246,7 +246,7 @@ class LeadProcessor:
             ('dance_studio', ['dance', 'ballet', 'salsa', 'ballroom']),
             ('personal_training', ['personal training', 'personal trainer', '1-on-1']),
             ('recreation_center', ['recreation', 'community center', 'ymca', 'ywca']),
-            ('boutique_fitness', ['yoga', 'pilates', 'barre', 'cycling', 'spin', 'hiit']),
+            ('boutique_fitness', ['yoga', 'pilates', 'barre', 'cycling', 'spin', 'hiit', 'boutique']),
             ('specialty_fitness', ['rock climbing', 'swimming', 'aquatic', 'tennis', 'racquet']),
             ('traditional_gym', ['gym', 'fitness center', 'health club', 'fitness club'])
         ]
@@ -1574,6 +1574,194 @@ class LeadProcessor:
         except Exception as e:
             logger.error(f"Error analyzing gym pain factors: {e}")
             return pain_factors
+    
+    def _apply_gym_size_and_model_scoring(self, lead: Dict[str, Any], pain_factors: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply gym size and business model-specific adjustments to pain scoring"""
+        try:
+            # Get gym size and business model data
+            gym_size = lead.get('gym_size_estimate', 'medium')
+            gym_type = lead.get('gym_type', 'traditional_gym')
+            
+            # Initialize adjustment factors
+            size_adjustments = {
+                'pain_multiplier': 1.0,
+                'critical_thresholds': {},
+                'size_specific_pain_factors': [],
+                'model_specific_pain_factors': [],
+                'adjusted_pain_score': pain_factors['pain_score'],
+                'size_context': '',
+                'model_context': ''
+            }
+            
+            # Size-specific pain adjustments
+            if gym_size == 'large':
+                # Large gyms have different pain points
+                size_adjustments['pain_multiplier'] = 1.2  # Higher stakes
+                size_adjustments['critical_thresholds'] = {
+                    'min_mobile_score': 70,  # Higher expectations
+                    'min_digital_infrastructure': 65,
+                    'required_features': ['online_booking', 'member_portal', 'payment_processing', 'mobile_app']
+                }
+                size_adjustments['size_context'] = 'Large gym with high member expectations'
+                
+                # Check for large gym-specific pain
+                # Only add if there are actual operational issues
+                operational_issues = pain_factors.get('operational_inefficiencies', [])
+                if len(operational_issues) == 0 and not lead.get('gym_software_detected'):
+                    size_adjustments['size_specific_pain_factors'].append({
+                        'factor': 'Scale inefficiencies',
+                        'impact': 'Managing 1000+ members manually costs $50K+ annually',
+                        'severity': 9
+                    })
+                
+                if lead.get('gym_mobile_app', {}).get('has_app', False) == False:
+                    size_adjustments['size_specific_pain_factors'].append({
+                        'factor': 'No mobile app for large facility',
+                        'impact': 'Losing 30%+ of millennial/Gen-Z prospects',
+                        'severity': 10
+                    })
+                
+            elif gym_size == 'small':
+                # Small gyms have different pain thresholds
+                size_adjustments['pain_multiplier'] = 0.8  # Lower absolute impact
+                size_adjustments['critical_thresholds'] = {
+                    'min_mobile_score': 50,  # Lower threshold
+                    'min_digital_infrastructure': 40,
+                    'required_features': ['online_booking', 'payment_processing']  # Fewer requirements
+                }
+                size_adjustments['size_context'] = 'Small gym with focused member base'
+                
+                # Small gym-specific opportunities
+                if not lead.get('gym_website_features', {}).get('social_integration', False):
+                    size_adjustments['size_specific_pain_factors'].append({
+                        'factor': 'Missing community building tools',
+                        'impact': 'Small gyms thrive on community - missing 40% growth potential',
+                        'severity': 8
+                    })
+                
+            else:  # medium
+                size_adjustments['pain_multiplier'] = 1.0
+                size_adjustments['critical_thresholds'] = {
+                    'min_mobile_score': 60,
+                    'min_digital_infrastructure': 50,
+                    'required_features': ['online_booking', 'member_portal', 'payment_processing']
+                }
+                size_adjustments['size_context'] = 'Medium gym balancing growth and efficiency'
+            
+            # Business model-specific adjustments
+            model_multipliers = {
+                'boutique_fitness': 1.3,  # High touch, high expectations
+                'crossfit': 1.2,          # Community-focused, tech-savvy members
+                'personal_training': 0.7,  # Lower tech needs
+                'martial_arts': 0.8,      # Traditional, less tech-dependent
+                'yoga_studio': 1.1,       # Wellness-focused, expect good UX
+                'boxing_gym': 0.9,        # Traditional sport focus
+                'dance_studio': 0.85,     # Schedule-focused
+                'traditional_gym': 1.0,   # Baseline
+                'recreation_center': 1.15  # Public expectations for accessibility
+            }
+            
+            model_multiplier = model_multipliers.get(gym_type, 1.0)
+            size_adjustments['model_multiplier'] = model_multiplier
+            
+            # Model-specific pain factors
+            if gym_type == 'boutique_fitness':
+                size_adjustments['model_context'] = 'Boutique fitness with premium expectations'
+                if lead.get('mobile_score', 100) < 80:
+                    size_adjustments['model_specific_pain_factors'].append({
+                        'factor': 'Subpar mobile experience for boutique',
+                        'impact': 'Premium clients expect premium digital experience',
+                        'severity': 9
+                    })
+                    
+            elif gym_type == 'crossfit':
+                size_adjustments['model_context'] = 'CrossFit box with community focus'
+                if not lead.get('gym_website_features', {}).get('social_integration', False):
+                    size_adjustments['model_specific_pain_factors'].append({
+                        'factor': 'No community features for CrossFit',
+                        'impact': 'CrossFit thrives on community - missing key differentiator',
+                        'severity': 8
+                    })
+                    
+            elif gym_type == 'yoga_studio':
+                size_adjustments['model_context'] = 'Yoga studio with wellness focus'
+                if not lead.get('gym_website_features', {}).get('class_scheduling', False):
+                    size_adjustments['model_specific_pain_factors'].append({
+                        'factor': 'No online class scheduling for yoga',
+                        'impact': 'Yoga students plan ahead - losing convenience-seekers',
+                        'severity': 9
+                    })
+            
+            # Calculate adjusted pain score
+            base_pain_score = pain_factors['pain_score']
+            
+            # Add size and model-specific pain factors
+            additional_pain_points = (
+                size_adjustments['size_specific_pain_factors'] + 
+                size_adjustments['model_specific_pain_factors']
+            )
+            
+            if additional_pain_points:
+                # Only add additional pain if base pain is already significant
+                # This prevents low-pain gyms from being flagged just because they're large
+                if base_pain_score >= 30:
+                    additional_severity = sum(p['severity'] for p in additional_pain_points) / len(additional_pain_points)
+                    additional_pain_contribution = additional_severity * 5  # Convert to 0-100 scale
+                    base_pain_score = (base_pain_score * 0.8) + (additional_pain_contribution * 0.2)
+                else:
+                    # For low base pain, only slightly increase based on additional factors
+                    additional_severity = sum(p['severity'] for p in additional_pain_points) / len(additional_pain_points)
+                    additional_pain_contribution = additional_severity * 2  # Smaller contribution for low pain
+                    base_pain_score = base_pain_score + (additional_pain_contribution * 0.1)
+            
+            # Apply size and model multipliers
+            adjusted_score = base_pain_score * size_adjustments['pain_multiplier'] * model_multiplier
+            size_adjustments['adjusted_pain_score'] = round(min(100, adjusted_score))
+            
+            # Recalculate urgency based on adjusted score
+            if size_adjustments['adjusted_pain_score'] >= 70:
+                size_adjustments['adjusted_urgency'] = 'critical'
+            elif size_adjustments['adjusted_pain_score'] >= 50:
+                size_adjustments['adjusted_urgency'] = 'high'
+            elif size_adjustments['adjusted_pain_score'] >= 30:
+                size_adjustments['adjusted_urgency'] = 'medium'
+            else:
+                size_adjustments['adjusted_urgency'] = 'low'
+            
+            # Check against critical thresholds
+            threshold_violations = []
+            
+            mobile_score = lead.get('mobile_score', 100)
+            if mobile_score < size_adjustments['critical_thresholds']['min_mobile_score']:
+                threshold_violations.append(f"Mobile score ({mobile_score}) below threshold for {gym_size} gym")
+            
+            digital_score = lead.get('digital_infrastructure_score', 100)
+            if digital_score < size_adjustments['critical_thresholds']['min_digital_infrastructure']:
+                threshold_violations.append(f"Digital infrastructure ({digital_score}) below threshold for {gym_size} gym")
+            
+            # Check required features
+            website_features = lead.get('gym_website_features', {})
+            for feature in size_adjustments['critical_thresholds']['required_features']:
+                if not website_features.get(feature, False):
+                    threshold_violations.append(f"Missing critical feature for {gym_size} gym: {feature}")
+            
+            size_adjustments['threshold_violations'] = threshold_violations
+            
+            # If there are critical violations, ensure urgency is at least 'high'
+            if threshold_violations and size_adjustments['adjusted_urgency'] == 'medium':
+                size_adjustments['adjusted_urgency'] = 'high'
+            
+            return size_adjustments
+            
+        except Exception as e:
+            logger.error(f"Error applying gym size and model scoring: {e}")
+            return {
+                'pain_multiplier': 1.0,
+                'model_multiplier': 1.0,
+                'adjusted_pain_score': pain_factors.get('pain_score', 0),
+                'adjusted_urgency': pain_factors.get('urgency_level', 'low'),
+                'error': str(e)
+            }
 
     def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
         """Get contextual software recommendations based on what was detected"""
@@ -1715,12 +1903,26 @@ class LeadProcessor:
                 
                 # Analyze gym-specific pain factors
                 gym_pain_analysis = self._analyze_gym_pain_factors(lead)
+                
+                # Apply size and model-specific scoring adjustments
+                size_model_adjustments = self._apply_gym_size_and_model_scoring(lead, gym_pain_analysis)
+                
+                # Update pain analysis with adjusted scores
                 lead['gym_pain_factors'] = gym_pain_analysis
                 lead['gym_pain_score'] = gym_pain_analysis['pain_score']
                 lead['gym_pain_urgency'] = gym_pain_analysis['urgency_level']
                 lead['gym_primary_pain_category'] = gym_pain_analysis['primary_pain_category']
                 lead['gym_total_pain_points'] = gym_pain_analysis['total_pain_points']
                 lead['gym_critical_pain_issues'] = gym_pain_analysis['critical_issues']
+                
+                # Add size/model adjusted scores
+                lead['gym_adjusted_pain_score'] = size_model_adjustments['adjusted_pain_score']
+                lead['gym_adjusted_urgency'] = size_model_adjustments['adjusted_urgency']
+                lead['gym_size_pain_multiplier'] = size_model_adjustments['pain_multiplier']
+                lead['gym_model_pain_multiplier'] = size_model_adjustments['model_multiplier']
+                lead['gym_threshold_violations'] = size_model_adjustments.get('threshold_violations', [])
+                lead['gym_size_context'] = size_model_adjustments.get('size_context', '')
+                lead['gym_model_context'] = size_model_adjustments.get('model_context', '')
                 
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
                 if gym_software_analysis['detected_software']:
@@ -1729,6 +1931,7 @@ class LeadProcessor:
                 logger.info(f"Mobile app analysis for {lead['business_name']}: {'Available' if mobile_app_analysis['has_mobile_app'] else 'Not available'} (quality: {mobile_app_analysis['app_quality_score']})")
                 logger.info(f"Digital infrastructure score for {lead['business_name']}: {digital_infrastructure_analysis['overall_score']}/100 ({digital_infrastructure_analysis['tier']}) - Readiness: {digital_infrastructure_analysis['digital_readiness']}/100")
                 logger.info(f"Gym pain analysis for {lead['business_name']}: pain_score={gym_pain_analysis['pain_score']}, urgency={gym_pain_analysis['urgency_level']}, primary_category={gym_pain_analysis['primary_pain_category']}")
+                logger.info(f"Size/Model adjustments for {lead['business_name']}: adjusted_score={size_model_adjustments['adjusted_pain_score']}, adjusted_urgency={size_model_adjustments['adjusted_urgency']}, size_multiplier={size_model_adjustments['pain_multiplier']}, model_multiplier={size_model_adjustments['model_multiplier']}")
             
             return lead
             
