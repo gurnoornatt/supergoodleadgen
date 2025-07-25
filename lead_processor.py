@@ -9,8 +9,10 @@ import time
 from datetime import datetime, timedelta
 from api_client import SerpApiClient, GooglePageSpeedClient, BuiltWithClient
 from screenshot_module import ScreenshotCapture
+from logo_extractor_mcp import LogoExtractorMCP
 from config import Config
 from logger_config import setup_logger
+from gym_software_database import gym_software_db
 
 logger = setup_logger(__name__)
 
@@ -22,6 +24,7 @@ class LeadProcessor:
         self.pagespeed_client = GooglePageSpeedClient()
         self.builtwith_client = BuiltWithClient()
         self.screenshot_capture = ScreenshotCapture()
+        self.logo_extractor = LogoExtractorMCP()
         
     def extract_leads_from_maps(self, query: str, location: str, max_results: int = 100) -> List[Dict[str, Any]]:
         """Extract business leads from Google Maps search with pagination"""
@@ -67,6 +70,9 @@ class LeadProcessor:
                 logger.debug("Skipping result with no business name")
                 return None
             
+            # Extract gym-specific data from result
+            gym_data = self._extract_gym_specific_data(result)
+            
             lead = {
                 'business_name': business_name,
                 'website': website,
@@ -91,7 +97,38 @@ class LeadProcessor:
                 'screenshot_url': '',
                 'logo_url': '',
                 'pdf_url': '',
-                'error_notes': ''
+                'error_notes': '',
+                # Gym-specific fields
+                'gym_type': gym_data.get('gym_type', ''),
+                'gym_size_estimate': gym_data.get('gym_size_estimate', ''),
+                'gym_size_confidence': gym_data.get('gym_size_confidence', 0),
+                'gym_size_factors': gym_data.get('gym_size_factors', []),
+                'gym_services': gym_data.get('gym_services', []),
+                'gym_location_type': gym_data.get('gym_location_type', ''),
+                'gym_membership_model': gym_data.get('gym_membership_model', ''),
+                'gym_equipment_types': gym_data.get('gym_equipment_types', []),
+                'gym_operating_hours': gym_data.get('gym_operating_hours', ''),
+                'gym_pricing_indicators': gym_data.get('gym_pricing_indicators', []),
+                'gym_target_demographic': gym_data.get('gym_target_demographic', ''),
+                'gym_franchise_chain': gym_data.get('gym_franchise_chain', ''),
+                'gym_years_in_business': gym_data.get('gym_years_in_business', ''),
+                'gym_staff_size_estimate': gym_data.get('gym_staff_size_estimate', ''),
+                'gym_digital_presence_score': gym_data.get('gym_digital_presence_score', 0),
+                'gym_software_needs_score': gym_data.get('gym_software_needs_score', 0),
+                # Gym software detection fields
+                'gym_software_detected': [],
+                'gym_software_scores': {},
+                'gym_software_quality_score': 0,
+                'gym_software_recommendations': [],
+                'gym_software_red_flags': [],
+                
+                # Website feature analysis fields
+                'gym_website_features': {},
+                'gym_website_feature_score': 0,
+                'gym_website_feature_indicators': [],
+                'gym_website_missing_features': [],
+                'gym_website_feature_recommendations': [],
+                'gym_website_implemented_features': 0
             }
             
             return lead
@@ -99,6 +136,1475 @@ class LeadProcessor:
         except Exception as e:
             logger.error(f"Error processing Maps result: {e}")
             return None
+    
+    def _extract_gym_specific_data(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract gym-specific data from Google Maps result"""
+        try:
+            business_name = result.get('title', '').lower()
+            description = result.get('snippet', '').lower()
+            categories = result.get('type', '').lower()
+            address = result.get('address', '').lower()
+            reviews_data = result.get('reviews_data', []) if isinstance(result.get('reviews_data'), list) else []
+            
+            # Combine all text data for analysis
+            combined_text = f"{business_name} {description} {categories} {address}"
+            
+            # Extract gym type based on business name and categories
+            gym_type = self._determine_gym_type(combined_text)
+            
+            # Estimate gym size based on available indicators
+            gym_size_estimate, size_estimation_details = self._estimate_gym_size_with_details(result, combined_text)
+            
+            # Extract services offered
+            gym_services = self._extract_gym_services(combined_text)
+            
+            # Determine location type
+            gym_location_type = self._determine_location_type(address, combined_text)
+            
+            # Estimate membership model
+            gym_membership_model = self._estimate_membership_model(combined_text)
+            
+            # Extract equipment types
+            gym_equipment_types = self._extract_equipment_types(combined_text)
+            
+            # Extract operating hours if available
+            gym_operating_hours = result.get('hours', '')
+            
+            # Extract pricing indicators
+            gym_pricing_indicators = self._extract_pricing_indicators(combined_text, reviews_data)
+            
+            # Determine target demographic
+            gym_target_demographic = self._determine_target_demographic(combined_text)
+            
+            # Check if it's a franchise/chain
+            gym_franchise_chain = self._identify_franchise_chain(business_name)
+            
+            # Estimate years in business (basic heuristic)
+            gym_years_in_business = self._estimate_years_in_business(result)
+            
+            # Estimate staff size
+            gym_staff_size_estimate = self._estimate_staff_size(gym_size_estimate, gym_type)
+            
+            # Calculate digital presence score
+            gym_digital_presence_score = self._calculate_digital_presence_score(result)
+            
+            # Calculate software needs score
+            gym_software_needs_score = self._calculate_software_needs_score(gym_type, gym_size_estimate, gym_services)
+            
+            return {
+                'gym_type': gym_type,
+                'gym_size_estimate': gym_size_estimate,
+                'gym_size_confidence': size_estimation_details.get('confidence_level', 0),
+                'gym_size_factors': size_estimation_details.get('confidence_factors', []),
+                'gym_services': gym_services,
+                'gym_location_type': gym_location_type,
+                'gym_membership_model': gym_membership_model,
+                'gym_equipment_types': gym_equipment_types,
+                'gym_operating_hours': gym_operating_hours,
+                'gym_pricing_indicators': gym_pricing_indicators,
+                'gym_target_demographic': gym_target_demographic,
+                'gym_franchise_chain': gym_franchise_chain,
+                'gym_years_in_business': gym_years_in_business,
+                'gym_staff_size_estimate': gym_staff_size_estimate,
+                'gym_digital_presence_score': gym_digital_presence_score,
+                'gym_software_needs_score': gym_software_needs_score
+            }
+            
+        except Exception as e:
+            logger.debug(f"Error extracting gym-specific data: {e}")
+            return {
+                'gym_type': '',
+                'gym_size_estimate': '',
+                'gym_size_confidence': 0,
+                'gym_size_factors': [],
+                'gym_services': [],
+                'gym_location_type': '',
+                'gym_membership_model': '',
+                'gym_equipment_types': [],
+                'gym_operating_hours': '',
+                'gym_pricing_indicators': [],
+                'gym_target_demographic': '',
+                'gym_franchise_chain': '',
+                'gym_years_in_business': '',
+                'gym_staff_size_estimate': '',
+                'gym_digital_presence_score': 0,
+                'gym_software_needs_score': 0,
+                # Gym software detection fields
+                'gym_software_detected': [],
+                'gym_software_scores': {},
+                'gym_software_quality_score': 0,
+                'gym_software_recommendations': [],
+                'gym_software_red_flags': []
+            }
+    
+    def _determine_gym_type(self, text: str) -> str:
+        """Determine gym type based on text analysis (ordered by specificity)"""
+        # Order matters - more specific types should be checked first
+        gym_types = [
+            ('crossfit', ['crossfit', 'cross fit']),
+            ('martial_arts', ['martial arts', 'karate', 'jiu jitsu', 'mma', 'boxing', 'kickboxing', 'dojo']),
+            ('dance_studio', ['dance', 'ballet', 'salsa', 'ballroom']),
+            ('personal_training', ['personal training', 'personal trainer', '1-on-1']),
+            ('recreation_center', ['recreation', 'community center', 'ymca', 'ywca']),
+            ('boutique_fitness', ['yoga', 'pilates', 'barre', 'cycling', 'spin', 'hiit']),
+            ('specialty_fitness', ['rock climbing', 'swimming', 'aquatic', 'tennis', 'racquet']),
+            ('traditional_gym', ['gym', 'fitness center', 'health club', 'fitness club'])
+        ]
+        
+        for gym_type, keywords in gym_types:
+            if any(keyword in text for keyword in keywords):
+                return gym_type
+        
+        return 'general_fitness'
+    
+    def _estimate_gym_size(self, result: Dict[str, Any], text: str) -> str:
+        """Enhanced gym size estimation using multiple data sources"""
+        # Collect all available data points
+        reviews = result.get('reviews', 0)
+        rating = result.get('rating', 0)
+        business_name = result.get('title', '').lower()
+        
+        # Initialize scoring system (higher score = larger gym)
+        size_score = 0
+        confidence_factors = []
+        
+        # 1. Review count analysis (most reliable indicator)
+        if reviews > 1000:
+            size_score += 80
+            confidence_factors.append(f"High review count ({reviews})")
+        elif reviews > 500:
+            size_score += 60
+            confidence_factors.append(f"Moderate-high review count ({reviews})")
+        elif reviews > 200:
+            size_score += 40
+            confidence_factors.append(f"Moderate review count ({reviews})")
+        elif reviews > 50:
+            size_score += 20
+            confidence_factors.append(f"Low-moderate review count ({reviews})")
+        else:
+            size_score += 0
+            confidence_factors.append(f"Low review count ({reviews})")
+        
+        # 2. Franchise/Chain identification (strong size indicator)
+        major_chains = ['planet fitness', '24 hour fitness', 'la fitness', 'gold\'s gym', 'lifetime', 'equinox']
+        mid_chains = ['anytime fitness', 'snap fitness', 'curves', 'orange theory', 'crunch']
+        
+        for chain in major_chains:
+            if chain in business_name:
+                size_score += 50
+                confidence_factors.append(f"Major chain: {chain}")
+                break
+        
+        for chain in mid_chains:
+            if chain in business_name:
+                size_score += 30
+                confidence_factors.append(f"Mid-size chain: {chain}")
+                break
+        
+        # 3. Text-based size indicators (weighted by specificity)
+        text_indicators = [
+            # Large indicators
+            (['multiple locations', 'locations', 'branches'], 40, 'large'),
+            (['24/7', '24 hour', 'always open'], 35, 'large'),
+            (['huge', 'massive', 'enormous'], 30, 'large'),
+            (['full service', 'complete facility', 'everything'], 25, 'large'),
+            (['chain', 'franchise'], 20, 'large'),
+            
+            # Medium indicators  
+            (['established', 'complete', 'full gym'], 15, 'medium'),
+            (['mid-size', 'medium'], 20, 'medium'),
+            (['multiple rooms', 'various equipment'], 10, 'medium'),
+            
+            # Small indicators (negative scoring for large)
+            (['boutique', 'intimate', 'cozy'], -30, 'small'),
+            (['studio', 'small'], -20, 'small'),
+            (['personal', 'private', 'exclusive'], -15, 'small'),
+            (['home', 'residential'], -40, 'small')
+        ]
+        
+        for keywords, score_change, size_hint in text_indicators:
+            if any(keyword in text for keyword in keywords):
+                size_score += score_change
+                confidence_factors.append(f"Text indicator: {keywords[0]} ({size_hint})")
+                break  # Only apply first match to avoid double-counting
+        
+        # 4. Business type size tendencies
+        business_type_scores = {
+            'recreation_center': 40,  # Usually large facilities
+            'traditional_gym': 20,   # Generally larger than boutique
+            'crossfit': 0,           # Varies widely
+            'martial_arts': -10,     # Usually smaller
+            'dance_studio': -15,     # Usually smaller
+            'boutique_fitness': -20, # Explicitly small/intimate
+            'personal_training': -30 # Usually very small
+        }
+        
+        gym_type = self._determine_gym_type(text)
+        type_score = business_type_scores.get(gym_type, 0)
+        if type_score != 0:
+            size_score += type_score
+            confidence_factors.append(f"Business type: {gym_type} ({type_score:+d})")
+        
+        # 5. Location type influence
+        if 'mall' in text or 'shopping center' in text:
+            size_score += 15
+            confidence_factors.append("Shopping center location (typically larger)")
+        elif 'strip' in text:
+            size_score -= 5
+            confidence_factors.append("Strip mall location (typically smaller)")
+        
+        # 6. Rating influence (high ratings with many reviews suggest established, larger gyms)
+        if rating >= 4.0 and reviews > 200:
+            size_score += 10
+            confidence_factors.append(f"High rating with many reviews ({rating}, {reviews})")
+        
+        # Convert score to size category with adjusted thresholds
+        if size_score >= 80:
+            estimated_size = 'large'
+        elif size_score >= 30:
+            estimated_size = 'medium'
+        else:
+            estimated_size = 'small'
+        
+        # Calculate confidence level
+        confidence_level = min(100, len(confidence_factors) * 20)
+        
+        # Store detailed estimation data for analysis
+        estimation_details = {
+            'size_score': size_score,
+            'confidence_level': confidence_level,
+            'confidence_factors': confidence_factors,
+            'estimated_size': estimated_size
+        }
+        
+        # Log detailed estimation for debugging
+        logger.debug(f"Gym size estimation for {business_name}: {estimated_size} "
+                    f"(score: {size_score}, confidence: {confidence_level}%)")
+        logger.debug(f"Factors: {', '.join(confidence_factors[:3])}")  # Log top 3 factors
+        
+        return estimated_size
+    
+    def _estimate_gym_size_with_details(self, result: Dict[str, Any], text: str) -> tuple:
+        """Enhanced gym size estimation that returns both size and detailed analytics"""
+        # Collect all available data points
+        reviews = result.get('reviews', 0)
+        rating = result.get('rating', 0)
+        business_name = result.get('title', '').lower()
+        
+        # Initialize scoring system (higher score = larger gym)
+        size_score = 0
+        confidence_factors = []
+        
+        # 1. Review count analysis (most reliable indicator)
+        if reviews > 1000:
+            size_score += 80
+            confidence_factors.append(f"High review count ({reviews})")
+        elif reviews > 500:
+            size_score += 60
+            confidence_factors.append(f"Moderate-high review count ({reviews})")
+        elif reviews > 200:
+            size_score += 40
+            confidence_factors.append(f"Moderate review count ({reviews})")
+        elif reviews > 50:
+            size_score += 20
+            confidence_factors.append(f"Low-moderate review count ({reviews})")
+        else:
+            size_score += 0
+            confidence_factors.append(f"Low review count ({reviews})")
+        
+        # 2. Franchise/Chain identification (strong size indicator)
+        major_chains = ['planet fitness', '24 hour fitness', 'la fitness', 'gold\'s gym', 'lifetime', 'equinox']
+        mid_chains = ['anytime fitness', 'snap fitness', 'curves', 'orange theory', 'crunch']
+        
+        for chain in major_chains:
+            if chain in business_name:
+                size_score += 50
+                confidence_factors.append(f"Major chain: {chain}")
+                break
+        
+        for chain in mid_chains:
+            if chain in business_name:
+                size_score += 30
+                confidence_factors.append(f"Mid-size chain: {chain}")
+                break
+        
+        # 3. Text-based size indicators (weighted by specificity)
+        text_indicators = [
+            # Large indicators
+            (['multiple locations', 'locations', 'branches'], 40, 'large'),
+            (['24/7', '24 hour', 'always open'], 35, 'large'),
+            (['huge', 'massive', 'enormous'], 30, 'large'),
+            (['full service', 'complete facility', 'everything'], 25, 'large'),
+            (['chain', 'franchise'], 20, 'large'),
+            
+            # Medium indicators  
+            (['established', 'complete', 'full gym'], 15, 'medium'),
+            (['mid-size', 'medium'], 20, 'medium'),
+            (['multiple rooms', 'various equipment'], 10, 'medium'),
+            
+            # Small indicators (negative scoring for large)
+            (['boutique', 'intimate', 'cozy'], -30, 'small'),
+            (['studio', 'small'], -20, 'small'),
+            (['personal', 'private', 'exclusive'], -15, 'small'),
+            (['home', 'residential'], -40, 'small')
+        ]
+        
+        for keywords, score_change, size_hint in text_indicators:
+            if any(keyword in text for keyword in keywords):
+                size_score += score_change
+                confidence_factors.append(f"Text indicator: {keywords[0]} ({size_hint})")
+                break  # Only apply first match to avoid double-counting
+        
+        # 4. Business type size tendencies
+        business_type_scores = {
+            'recreation_center': 40,  # Usually large facilities
+            'traditional_gym': 20,   # Generally larger than boutique
+            'crossfit': 0,           # Varies widely
+            'martial_arts': -10,     # Usually smaller
+            'dance_studio': -15,     # Usually smaller
+            'boutique_fitness': -20, # Explicitly small/intimate
+            'personal_training': -30 # Usually very small
+        }
+        
+        gym_type = self._determine_gym_type(text)
+        type_score = business_type_scores.get(gym_type, 0)
+        if type_score != 0:
+            size_score += type_score
+            confidence_factors.append(f"Business type: {gym_type} ({type_score:+d})")
+        
+        # 5. Location type influence
+        if 'mall' in text or 'shopping center' in text:
+            size_score += 15
+            confidence_factors.append("Shopping center location (typically larger)")
+        elif 'strip' in text:
+            size_score -= 5
+            confidence_factors.append("Strip mall location (typically smaller)")
+        
+        # 6. Rating influence (high ratings with many reviews suggest established, larger gyms)
+        if rating >= 4.0 and reviews > 200:
+            size_score += 10
+            confidence_factors.append(f"High rating with many reviews ({rating}, {reviews})")
+        
+        # Convert score to size category with adjusted thresholds
+        if size_score >= 80:
+            estimated_size = 'large'
+        elif size_score >= 30:
+            estimated_size = 'medium'
+        else:
+            estimated_size = 'small'
+        
+        # Calculate confidence level
+        confidence_level = min(100, len(confidence_factors) * 20)
+        
+        # Store detailed estimation data for analysis
+        estimation_details = {
+            'size_score': size_score,
+            'confidence_level': confidence_level,
+            'confidence_factors': confidence_factors,
+            'estimated_size': estimated_size,
+            'review_count': reviews,
+            'rating': rating,
+            'business_name': business_name
+        }
+        
+        # Log detailed estimation for debugging
+        logger.debug(f"Gym size estimation for {business_name}: {estimated_size} "
+                    f"(score: {size_score}, confidence: {confidence_level}%)")
+        logger.debug(f"Factors: {', '.join(confidence_factors[:3])}")  # Log top 3 factors
+        
+        return estimated_size, estimation_details
+    
+    def _extract_gym_services(self, text: str) -> List[str]:
+        """Extract services offered by the gym"""
+        services = []
+        service_keywords = {
+            'personal_training': ['personal training', 'personal trainer', 'pt'],
+            'group_classes': ['group classes', 'fitness classes', 'group fitness'],
+            'yoga': ['yoga', 'vinyasa', 'hatha', 'bikram'],
+            'pilates': ['pilates', 'reformer'],
+            'cardio': ['cardio', 'treadmill', 'elliptical', 'bike'],
+            'strength_training': ['strength', 'weights', 'weight training', 'free weights'],
+            'swimming': ['pool', 'swimming', 'aquatic', 'water'],
+            'childcare': ['childcare', 'kids club', 'child care'],
+            'nutrition': ['nutrition', 'meal planning', 'diet'],
+            'physical_therapy': ['physical therapy', 'rehabilitation', 'recovery'],
+            'spa_services': ['spa', 'massage', 'sauna', 'steam'],
+            'sports': ['basketball', 'tennis', 'racquetball', 'volleyball']
+        }
+        
+        for service, keywords in service_keywords.items():
+            if any(keyword in text for keyword in keywords):
+                services.append(service)
+        
+        return services
+    
+    def _determine_location_type(self, address: str, text: str) -> str:
+        """Determine gym location type"""
+        if any(keyword in text for keyword in ['mall', 'shopping center', 'plaza']):
+            return 'shopping_center'
+        elif any(keyword in text for keyword in ['downtown', 'city center', 'urban']):
+            return 'urban'
+        elif any(keyword in text for keyword in ['suburb', 'residential']):
+            return 'suburban'
+        elif any(keyword in text for keyword in ['strip mall', 'strip center']):
+            return 'strip_mall'
+        else:
+            return 'standalone'
+    
+    def _estimate_membership_model(self, text: str) -> str:
+        """Estimate membership model based on text analysis"""
+        if any(keyword in text for keyword in ['drop-in', 'day pass', 'per class', 'pay per']):
+            return 'pay_per_use'
+        elif any(keyword in text for keyword in ['membership', 'monthly', 'annual']):
+            return 'membership'
+        elif any(keyword in text for keyword in ['package', 'session', 'bundle']):
+            return 'package_based'
+        else:
+            return 'membership'
+    
+    def _extract_equipment_types(self, text: str) -> List[str]:
+        """Extract equipment types available"""
+        equipment = []
+        equipment_keywords = {
+            'cardio_equipment': ['treadmill', 'elliptical', 'bike', 'stair', 'rowing'],
+            'free_weights': ['free weights', 'dumbbells', 'barbells', 'plates'],
+            'machines': ['machines', 'cable', 'smith machine', 'leg press'],
+            'functional': ['functional', 'kettlebell', 'battle rope', 'suspension'],
+            'specialized': ['reformer', 'climbing wall', 'pool', 'court']
+        }
+        
+        for equipment_type, keywords in equipment_keywords.items():
+            if any(keyword in text for keyword in keywords):
+                equipment.append(equipment_type)
+        
+        return equipment
+    
+    def _extract_pricing_indicators(self, text: str, reviews_data: List[Dict]) -> List[str]:
+        """Extract pricing indicators from text and reviews"""
+        pricing_indicators = []
+        
+        # Direct price mentions
+        if any(keyword in text for keyword in ['$', 'dollar', 'cheap', 'affordable', 'budget']):
+            pricing_indicators.append('budget_friendly')
+        if any(keyword in text for keyword in ['premium', 'luxury', 'high-end', 'exclusive']):
+            pricing_indicators.append('premium')
+        
+        # From reviews (if available)
+        for review in reviews_data[:5]:  # Check first 5 reviews
+            review_text = review.get('text', '').lower()
+            if 'expensive' in review_text or 'costly' in review_text:
+                pricing_indicators.append('high_price')
+            elif 'affordable' in review_text or 'reasonable' in review_text:
+                pricing_indicators.append('reasonable_price')
+        
+        return list(set(pricing_indicators))  # Remove duplicates
+    
+    def _determine_target_demographic(self, text: str) -> str:
+        """Determine target demographic"""
+        if any(keyword in text for keyword in ['women', 'ladies', 'female']):
+            return 'women'
+        elif any(keyword in text for keyword in ['senior', 'older', 'mature']):
+            return 'seniors'
+        elif any(keyword in text for keyword in ['youth', 'teen', 'junior']):
+            return 'youth'
+        elif any(keyword in text for keyword in ['athlete', 'performance', 'competitive']):
+            return 'athletes'
+        else:
+            return 'general'
+    
+    def _identify_franchise_chain(self, business_name: str) -> str:
+        """Identify if business is part of a franchise or chain"""
+        chains = [
+            'planet fitness', '24 hour fitness', 'la fitness', 'gold\'s gym',
+            'anytime fitness', 'snap fitness', 'curves', 'orange theory',
+            'crossfit', 'pure barre', 'soulcycle', 'equinox', 'lifetime',
+            'crunch', 'ymca', 'ywca'
+        ]
+        
+        for chain in chains:
+            if chain in business_name:
+                return chain.title()
+        
+        return ''
+    
+    def _estimate_years_in_business(self, result: Dict[str, Any]) -> str:
+        """Estimate years in business (basic heuristic)"""
+        reviews = result.get('reviews', 0)
+        
+        if reviews > 1000:
+            return '10+'
+        elif reviews > 500:
+            return '5-10'
+        elif reviews > 100:
+            return '2-5'
+        else:
+            return '0-2'
+    
+    def _estimate_staff_size(self, gym_size: str, gym_type: str) -> str:
+        """Estimate staff size based on gym size and type"""
+        if gym_size == 'large':
+            return '20+'
+        elif gym_size == 'medium':
+            return '10-20'
+        elif gym_type in ['personal_training', 'boutique_fitness']:
+            return '2-5'
+        else:
+            return '5-10'
+    
+    def _calculate_digital_presence_score(self, result: Dict[str, Any]) -> int:
+        """Calculate digital presence score (0-100)"""
+        score = 0
+        
+        # Has website
+        if result.get('website'):
+            score += 30
+        
+        # Has Google Business Profile
+        if result.get('place_id'):
+            score += 20
+        
+        # Has reviews
+        reviews = result.get('reviews', 0)
+        if reviews > 0:
+            score += min(30, reviews // 10)  # Up to 30 points for reviews
+        
+        # Has rating
+        if result.get('rating', 0) > 0:
+            score += 10
+        
+        # Has photos (if available in result)
+        if result.get('photos'):
+            score += 10
+        
+        return min(100, score)
+    
+    def _calculate_software_needs_score(self, gym_type: str, gym_size: str, services: List[str]) -> int:
+        """Calculate software needs score (0-100) - higher means more need"""
+        score = 0
+        
+        # Base score by gym type
+        type_scores = {
+            'traditional_gym': 80,
+            'boutique_fitness': 70,
+            'crossfit': 75,
+            'martial_arts': 65,
+            'dance_studio': 60,
+            'specialty_fitness': 70,
+            'personal_training': 85,
+            'recreation_center': 90
+        }
+        score += type_scores.get(gym_type, 70)
+        
+        # Size multiplier
+        size_multipliers = {
+            'large': 1.2,
+            'medium': 1.0,
+            'small': 0.8
+        }
+        score *= size_multipliers.get(gym_size, 1.0)
+        
+        # Service complexity adds to needs
+        complex_services = ['personal_training', 'group_classes', 'childcare', 'nutrition']
+        service_bonus = sum(5 for service in services if service in complex_services)
+        score += service_bonus
+        
+        return min(100, int(score))
+    
+    def _analyze_gym_software(self, technologies: List[Dict[str, Any]], website: str) -> Dict[str, Any]:
+        """Analyze gym management software using the gym software database"""
+        try:
+            # Detect software from technologies
+            detected_from_tech = gym_software_db.detect_software_from_technologies(technologies)
+            
+            # Detect software from website URL
+            detected_from_url = gym_software_db.detect_software_from_url(website)
+            
+            # Combine and deduplicate detections
+            all_detected = list(set(detected_from_tech + detected_from_url))
+            
+            software_scores = {}
+            recommendations = []
+            red_flags = []
+            overall_scores = []
+            
+            # Analyze each detected software
+            for software_key in all_detected:
+                software = gym_software_db.get_software_by_name(software_key.replace('_', ' '))
+                if software:
+                    # Get quality score
+                    score_data = gym_software_db.score_software_quality(software.name)
+                    software_scores[software.name] = score_data
+                    overall_scores.append(score_data['quality_score'])
+                    
+                    # Add recommendations and red flags
+                    recommendations.append(score_data['recommendation'])
+                    
+                    # Check for red flags
+                    if score_data['quality_score'] < 40:
+                        red_flags.append(f"Using outdated software: {software.name}")
+                    
+                    if not software.mobile_app:
+                        red_flags.append(f"No mobile app available for {software.name}")
+                    
+                    if not software.api_available:
+                        red_flags.append(f"Limited integration capabilities for {software.name}")
+                    
+                    if software.quality.value == 'outdated':
+                        red_flags.append(f"CRITICAL: {software.name} uses outdated technology")
+            
+            # Calculate overall software quality score
+            if overall_scores:
+                overall_quality_score = sum(overall_scores) / len(overall_scores)
+            else:
+                overall_quality_score = 0
+            
+            # Check if no specialized gym software was detected
+            generic_software = ['wordpress', 'square', 'stripe', 'calendly']
+            has_only_generic = all_detected and all(any(generic in software_key for generic in generic_software) for software_key in all_detected)
+            
+            if not all_detected or has_only_generic:
+                recommendations.append("No specialized gym management software detected")
+            
+            # Add contextual recommendations based on gym type and size
+            contextual_recommendations = self._get_contextual_software_recommendations(all_detected)
+            recommendations.extend(contextual_recommendations)
+            
+            return {
+                'detected_software': [software_key.replace('_', ' ').title() for software_key in all_detected],
+                'software_scores': software_scores,
+                'overall_quality_score': round(overall_quality_score, 1),
+                'recommendations': recommendations,
+                'red_flags': red_flags,
+                'detection_methods': {
+                    'from_technologies': detected_from_tech,
+                    'from_url': detected_from_url
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing gym software: {e}")
+            return {
+                'detected_software': [],
+                'software_scores': {},
+                'overall_quality_score': 0,
+                'recommendations': ['Software analysis failed'],
+                'red_flags': [],
+                'detection_methods': {'from_technologies': [], 'from_url': []}
+            }
+    
+    def _analyze_gym_website_features(self, website: str, technologies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze gym website for key digital features and functionality"""
+        try:
+            features = {
+                'online_booking': False,
+                'class_scheduling': False,
+                'membership_management': False,
+                'payment_processing': False,
+                'member_portal': False,
+                'mobile_responsive': False,
+                'ecommerce': False,
+                'virtual_classes': False,
+                'live_chat': False,
+                'social_integration': False
+            }
+            
+            feature_indicators = []
+            missing_features = []
+            
+            if not website or not technologies:
+                return {
+                    'detected_features': features,
+                    'feature_score': 0,
+                    'feature_indicators': ['No website or technology data available'],
+                    'missing_features': list(features.keys()),
+                    'recommendations': ['Implement basic website with core gym features'],
+                    'implemented_count': 0,
+                    'total_features': len(features)
+                }
+            
+            # Analyze technologies for feature detection
+            tech_names = [tech.get('name', '').lower() for tech in technologies]
+            tech_categories = [tech.get('category', '').lower() for tech in technologies]
+            all_tech_text = ' '.join(tech_names + tech_categories)
+            
+            # Online booking detection
+            booking_indicators = [
+                'mindbody', 'zenplanner', 'wodify', 'glofox', 'teamup', 'acuity', 
+                'calendly', 'schedulicity', 'booking', 'appointment', 'reserve'
+            ]
+            if any(indicator in all_tech_text for indicator in booking_indicators):
+                features['online_booking'] = True
+                feature_indicators.append('Online booking system detected')
+            else:
+                missing_features.append('online_booking')
+            
+            # Class scheduling detection
+            scheduling_indicators = [
+                'schedule', 'class', 'timetable', 'calendar', 'booking', 'mindbody',
+                'zenplanner', 'wodify', 'glofox', 'teamup'
+            ]
+            if any(indicator in all_tech_text for indicator in scheduling_indicators):
+                features['class_scheduling'] = True
+                feature_indicators.append('Class scheduling system detected')
+            else:
+                missing_features.append('class_scheduling')
+            
+            # Payment processing detection
+            payment_indicators = [
+                'stripe', 'paypal', 'square', 'payment', 'billing', 'checkout',
+                'ecommerce', 'shop', 'cart', 'braintree', 'authorize.net'
+            ]
+            if any(indicator in all_tech_text for indicator in payment_indicators):
+                features['payment_processing'] = True
+                feature_indicators.append('Payment processing system detected')
+            else:
+                missing_features.append('payment_processing')
+            
+            # Member portal/management detection
+            member_indicators = [
+                'member', 'login', 'account', 'portal', 'dashboard', 'profile',
+                'mindbody', 'zenplanner', 'wodify', 'glofox'
+            ]
+            if any(indicator in all_tech_text for indicator in member_indicators):
+                features['membership_management'] = True
+                feature_indicators.append('Member management system detected')
+            else:
+                missing_features.append('membership_management')
+            
+            # Member portal detection (separate from management)
+            portal_indicators = [
+                'member portal', 'client portal', 'login', 'account access',
+                'dashboard', 'member area', 'my account'
+            ]
+            if any(indicator in all_tech_text for indicator in portal_indicators):
+                features['member_portal'] = True
+                feature_indicators.append('Member portal detected')
+            else:
+                missing_features.append('member_portal')
+            
+            # Mobile responsiveness detection
+            mobile_indicators = [
+                'responsive', 'mobile', 'viewport', 'bootstrap', 'foundation',
+                'flexbox', 'grid', 'media queries'
+            ]
+            if any(indicator in all_tech_text for indicator in mobile_indicators):
+                features['mobile_responsive'] = True
+                feature_indicators.append('Mobile responsive design detected')
+            else:
+                missing_features.append('mobile_responsive')
+            
+            # E-commerce detection
+            ecommerce_indicators = [
+                'woocommerce', 'shopify', 'magento', 'ecommerce', 'shop', 'cart',
+                'product', 'merchandise', 'store', 'retail'
+            ]
+            if any(indicator in all_tech_text for indicator in ecommerce_indicators):
+                features['ecommerce'] = True
+                feature_indicators.append('E-commerce functionality detected')
+            else:
+                missing_features.append('ecommerce')
+            
+            # Virtual classes detection
+            virtual_indicators = [
+                'zoom', 'livestream', 'virtual', 'online classes', 'video',
+                'streaming', 'webex', 'meet', 'live', 'remote'
+            ]
+            if any(indicator in all_tech_text for indicator in virtual_indicators):
+                features['virtual_classes'] = True
+                feature_indicators.append('Virtual classes capability detected')
+            else:
+                missing_features.append('virtual_classes')
+            
+            # Live chat detection
+            chat_indicators = [
+                'chat', 'intercom', 'zendesk', 'drift', 'crisp', 'tawk',
+                'messenger', 'support', 'helpdesk'
+            ]
+            if any(indicator in all_tech_text for indicator in chat_indicators):
+                features['live_chat'] = True
+                feature_indicators.append('Live chat support detected')
+            else:
+                missing_features.append('live_chat')
+            
+            # Social media integration detection
+            social_indicators = [
+                'facebook', 'instagram', 'twitter', 'social', 'share',
+                'youtube', 'tiktok', 'linkedin', 'social media'
+            ]
+            if any(indicator in all_tech_text for indicator in social_indicators):
+                features['social_integration'] = True
+                feature_indicators.append('Social media integration detected')
+            else:
+                missing_features.append('social_integration')
+            
+            # Calculate feature score (0-100)
+            total_features = len(features)
+            implemented_features = sum(1 for implemented in features.values() if implemented)
+            feature_score = (implemented_features / total_features) * 100
+            
+            # Generate recommendations based on missing features
+            recommendations = []
+            if not features['online_booking']:
+                recommendations.append('Implement online booking system (MindBody, Zen Planner, or similar)')
+            if not features['payment_processing']:
+                recommendations.append('Add online payment processing (Stripe, Square)')
+            if not features['mobile_responsive']:
+                recommendations.append('Upgrade to mobile-responsive website design')
+            if not features['member_portal']:
+                recommendations.append('Create member portal for account management')
+            if not features['virtual_classes']:
+                recommendations.append('Add virtual/online class capabilities')
+            
+            # Add priority recommendations for low-scoring websites
+            if feature_score < 30:
+                recommendations.insert(0, 'URGENT: Complete website overhaul needed - missing critical features')
+            elif feature_score < 50:
+                recommendations.insert(0, 'Major website improvements needed for competitive digital presence')
+            
+            return {
+                'detected_features': features,
+                'feature_score': round(feature_score, 1),
+                'feature_indicators': feature_indicators,
+                'missing_features': missing_features,
+                'recommendations': recommendations,
+                'implemented_count': implemented_features,
+                'total_features': total_features
+            }
+            
+        except Exception as e:
+            logger.error(f"Error analyzing gym website features: {e}")
+            return {
+                'detected_features': {key: False for key in ['online_booking', 'class_scheduling', 'membership_management', 'payment_processing', 'member_portal', 'mobile_responsive', 'ecommerce', 'virtual_classes', 'live_chat', 'social_integration']},
+                'feature_score': 0,
+                'feature_indicators': ['Feature analysis failed'],
+                'missing_features': ['Feature analysis error'],
+                'recommendations': ['Website feature analysis could not be completed'],
+                'implemented_count': 0,
+                'total_features': 10
+            }
+
+    def _analyze_gym_mobile_app(self, business_name: str, website: str, detected_software: List[str]) -> Dict[str, Any]:
+        """Analyze gym mobile app availability and quality"""
+        try:
+            app_analysis = {
+                'has_mobile_app': False,
+                'app_platforms': [],
+                'app_quality_score': 0,
+                'app_rating_ios': None,
+                'app_rating_android': None,
+                'app_quality_issues': [],
+                'app_recommendations': [],
+                'detection_method': 'software_analysis'
+            }
+            
+            # Check if gym software indicates mobile app availability
+            software_with_apps = {
+                'mindbody': {'name': 'MindBody Connect', 'quality': 85},
+                'zen_planner': {'name': 'Zen Planner', 'quality': 75},
+                'wodify': {'name': 'Wodify', 'quality': 80},
+                'glofox': {'name': 'Glofox', 'quality': 75},
+                'teamup': {'name': 'TeamUp', 'quality': 70},
+                'wellnessliving': {'name': 'WellnessLiving', 'quality': 75},
+                'clubready': {'name': 'ClubReady', 'quality': 60},
+                'pushpress': {'name': 'PushPress', 'quality': 65},
+                'pike13': {'name': 'Pike13', 'quality': 70}
+            }
+            
+            # Analyze detected software for mobile app capabilities
+            detected_app_software = []
+            total_quality = 0
+            app_count = 0
+            
+            for software_name in detected_software:
+                # Convert software name back to database key format
+                software_key = software_name.lower().replace(' ', '_')
+                if software_key in software_with_apps:
+                    app_info = software_with_apps[software_key]
+                    detected_app_software.append(app_info['name'])
+                    total_quality += app_info['quality']
+                    app_count += 1
+                    app_analysis['has_mobile_app'] = True
+                    
+                    # Add platforms only once (avoid duplicates)
+                    if 'iOS' not in app_analysis['app_platforms']:
+                        app_analysis['app_platforms'].append('iOS')
+                    if 'Android' not in app_analysis['app_platforms']:
+                        app_analysis['app_platforms'].append('Android')
+            
+            # Calculate overall app quality score
+            if app_count > 0:
+                app_analysis['app_quality_score'] = round(total_quality / app_count, 1)
+                
+                # Provide quality assessment
+                if app_analysis['app_quality_score'] >= 80:
+                    app_analysis['app_recommendations'].append('Excellent mobile app solution detected')
+                elif app_analysis['app_quality_score'] >= 70:
+                    app_analysis['app_recommendations'].append('Good mobile app solution in use')
+                elif app_analysis['app_quality_score'] >= 60:
+                    app_analysis['app_recommendations'].append('Acceptable mobile app - consider improvements')
+                else:
+                    app_analysis['app_quality_issues'].append('Low-quality mobile app solution')
+                    app_analysis['app_recommendations'].append('Consider upgrading to better mobile app platform')
+            
+            # Check for basic/generic solutions without good mobile apps
+            basic_software = ['square', 'calendly', 'wordpress', 'stripe']
+            has_only_basic = detected_software and all(any(basic in software_name.lower().replace(' ', '_') for basic in basic_software) for software_name in detected_software)
+            
+            if has_only_basic or not app_analysis['has_mobile_app']:
+                app_analysis['app_quality_issues'].extend([
+                    'No dedicated gym mobile app detected',
+                    'Members likely cannot book classes via mobile app',
+                    'Missing mobile-first member experience'
+                ])
+                app_analysis['app_recommendations'].extend([
+                    'CRITICAL: Implement dedicated gym mobile app',
+                    'Consider MindBody, Glofox, or Wodify for comprehensive mobile solutions',
+                    'Mobile app essential for member retention and convenience'
+                ])
+            
+            # Check for mobile responsiveness as fallback
+            if not app_analysis['has_mobile_app']:
+                # Look for mobile-responsive indicators in website technologies
+                mobile_indicators = ['bootstrap', 'responsive', 'mobile', 'jquery_mobile']
+                detected_software_text = ' '.join([name.lower().replace(' ', '_') for name in detected_software])
+                has_mobile_web = any(indicator in detected_software_text for indicator in mobile_indicators)
+                
+                if has_mobile_web:
+                    app_analysis['app_recommendations'].append('Mobile-responsive website detected, but dedicated app still recommended')
+                else:
+                    app_analysis['app_quality_issues'].append('Neither mobile app nor mobile-responsive website detected')
+                    app_analysis['app_recommendations'].append('URGENT: Implement mobile-responsive website as minimum requirement')
+            
+            # Additional quality issues based on software age and capabilities
+            outdated_software = ['abc_financial', 'perfect_gym']
+            has_outdated = any(outdated in software_name.lower().replace(' ', '_') for software_name in detected_software for outdated in outdated_software)
+            
+            if has_outdated:
+                app_analysis['app_quality_issues'].extend([
+                    'Outdated software platform with poor mobile support',
+                    'Mobile app likely has limited functionality'
+                ])
+                app_analysis['app_recommendations'].append('Upgrade to modern platform for better mobile experience')
+            
+            return app_analysis
+            
+        except Exception as e:
+            logger.error(f"Error analyzing gym mobile app: {e}")
+            return {
+                'has_mobile_app': False,
+                'app_platforms': [],
+                'app_quality_score': 0,
+                'app_rating_ios': None,
+                'app_rating_android': None,
+                'app_quality_issues': ['Mobile app analysis failed'],
+                'app_recommendations': ['Unable to analyze mobile app capabilities'],
+                'detection_method': 'error'
+            }
+
+    def _calculate_digital_infrastructure_score(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate comprehensive digital infrastructure score for gym"""
+        try:
+            # Initialize scoring components
+            scoring_components = {
+                'website_features': {'score': 0, 'weight': 0.35, 'max_score': 100},
+                'mobile_app_quality': {'score': 0, 'weight': 0.25, 'max_score': 100},
+                'online_booking': {'score': 0, 'weight': 0.20, 'max_score': 100},
+                'member_experience': {'score': 0, 'weight': 0.20, 'max_score': 100}
+            }
+            
+            # Website Features Score (35% weight)
+            website_score = lead.get('gym_website_feature_score', 0)
+            scoring_components['website_features']['score'] = website_score
+            
+            # Mobile App Quality Score (25% weight)
+            mobile_app_score = lead.get('gym_mobile_app_quality_score', 0)
+            scoring_components['mobile_app_quality']['score'] = mobile_app_score
+            
+            # Online Booking Capabilities Score (20% weight)
+            booking_score = self._calculate_online_booking_score(lead)
+            scoring_components['online_booking']['score'] = booking_score
+            
+            # Member Experience Score (20% weight)
+            experience_score = self._calculate_member_experience_score(lead)
+            scoring_components['member_experience']['score'] = experience_score
+            
+            # Calculate weighted overall score
+            total_weighted_score = 0
+            total_weight = 0
+            
+            for component, data in scoring_components.items():
+                weighted_contribution = (data['score'] / data['max_score']) * data['weight'] * 100
+                total_weighted_score += weighted_contribution
+                total_weight += data['weight']
+            
+            overall_score = round(total_weighted_score / total_weight, 1)
+            
+            # Determine digital infrastructure tier
+            if overall_score >= 80:
+                tier = 'excellent'
+                tier_description = 'Excellent digital infrastructure - comprehensive modern platform'
+            elif overall_score >= 65:
+                tier = 'good'
+                tier_description = 'Good digital infrastructure - some areas for improvement'
+            elif overall_score >= 45:
+                tier = 'average'
+                tier_description = 'Average digital infrastructure - significant gaps present'
+            elif overall_score >= 25:
+                tier = 'poor'
+                tier_description = 'Poor digital infrastructure - major upgrades needed'
+            else:
+                tier = 'critical'
+                tier_description = 'Critical digital infrastructure gaps - immediate action required'
+            
+            # Generate improvement recommendations
+            recommendations = self._generate_infrastructure_recommendations(scoring_components, lead)
+            
+            # Calculate digital readiness for modern members
+            digital_readiness = self._calculate_digital_readiness(scoring_components)
+            
+            return {
+                'overall_score': overall_score,
+                'tier': tier,
+                'tier_description': tier_description,
+                'component_scores': {
+                    'website_features': website_score,
+                    'mobile_app_quality': mobile_app_score,
+                    'online_booking': booking_score,
+                    'member_experience': experience_score
+                },
+                'weighted_contributions': {
+                    comp: round((data['score'] / data['max_score']) * data['weight'] * 100, 1)
+                    for comp, data in scoring_components.items()
+                },
+                'digital_readiness': digital_readiness,
+                'improvement_recommendations': recommendations,
+                'critical_gaps': self._identify_critical_gaps(scoring_components, lead),
+                'competitive_analysis': self._assess_competitive_position(overall_score)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error calculating digital infrastructure score: {e}")
+            return {
+                'overall_score': 0,
+                'tier': 'error',
+                'tier_description': 'Unable to calculate digital infrastructure score',
+                'component_scores': {'website_features': 0, 'mobile_app_quality': 0, 'online_booking': 0, 'member_experience': 0},
+                'weighted_contributions': {'website_features': 0, 'mobile_app_quality': 0, 'online_booking': 0, 'member_experience': 0},
+                'digital_readiness': 0,
+                'improvement_recommendations': ['Digital infrastructure analysis failed'],
+                'critical_gaps': ['Analysis error'],
+                'competitive_analysis': 'Unable to assess competitive position'
+            }
+    
+    def _calculate_online_booking_score(self, lead: Dict[str, Any]) -> float:
+        """Calculate online booking capabilities score"""
+        score = 0
+        
+        # Check if online booking is available
+        website_features = lead.get('gym_website_features', {})
+        if website_features.get('online_booking', False):
+            score += 50  # Base score for having online booking
+            
+            # Bonus for comprehensive booking features
+            if website_features.get('class_scheduling', False):
+                score += 20
+            if website_features.get('membership_management', False):
+                score += 15
+            if website_features.get('payment_processing', False):
+                score += 15
+        
+        # Check for specialized gym software with booking
+        detected_software = lead.get('gym_software_detected', [])
+        booking_software = ['MindBody', 'Zen Planner', 'Wodify', 'Glofox', 'TeamUp', 'Acuity Scheduling', 'Calendly']
+        
+        has_booking_software = any(software in detected_software for software in booking_software)
+        if has_booking_software:
+            score = max(score, 60)  # Minimum score if booking software detected
+            
+            # Premium booking software bonus
+            premium_booking = ['MindBody', 'Glofox', 'Wodify']
+            if any(software in detected_software for software in premium_booking):
+                score += 20
+        
+        # Penalties for poor implementation
+        mobile_app_available = lead.get('gym_mobile_app_available', False)
+        if not mobile_app_available and score > 0:
+            score -= 15  # Penalty for no mobile booking
+        
+        return min(100, max(0, score))
+    
+    def _calculate_member_experience_score(self, lead: Dict[str, Any]) -> float:
+        """Calculate overall member digital experience score"""
+        score = 0
+        
+        # Website user experience factors
+        website_features = lead.get('gym_website_features', {})
+        mobile_score = lead.get('mobile_score', 0)
+        
+        # Mobile responsiveness (critical for member experience)
+        if website_features.get('mobile_responsive', False):
+            score += 25
+        elif mobile_score >= 60:
+            score += 15  # Partial credit for decent mobile performance
+        
+        # Member portal and self-service
+        if website_features.get('member_portal', False):
+            score += 20
+        
+        # Communication and engagement
+        if website_features.get('live_chat', False):
+            score += 10
+        if website_features.get('social_integration', False):
+            score += 10
+        
+        # Modern features
+        if website_features.get('virtual_classes', False):
+            score += 15  # Important post-COVID feature
+        if website_features.get('ecommerce', False):
+            score += 10
+        
+        # Mobile app experience
+        mobile_app_score = lead.get('gym_mobile_app_quality_score', 0)
+        if mobile_app_score > 0:
+            score += min(20, mobile_app_score * 0.2)  # Up to 20 points from mobile app
+        
+        # Technology age factor
+        tech_age_score = lead.get('technology_age_score', 70)
+        if tech_age_score < 50:
+            score -= 15  # Penalty for outdated technology
+        elif tech_age_score > 80:
+            score += 5   # Bonus for modern technology
+        
+        return min(100, max(0, round(score, 1)))
+    
+    def _generate_infrastructure_recommendations(self, scoring_components: Dict[str, Any], lead: Dict[str, Any]) -> List[str]:
+        """Generate prioritized recommendations for digital infrastructure improvements"""
+        recommendations = []
+        
+        # Analyze each component for improvement opportunities
+        website_score = scoring_components['website_features']['score']
+        mobile_score = scoring_components['mobile_app_quality']['score']
+        booking_score = scoring_components['online_booking']['score']
+        experience_score = scoring_components['member_experience']['score']
+        
+        # Critical improvements (score < 30)
+        if website_score < 30:
+            recommendations.append("CRITICAL: Website overhaul needed - implement modern gym website with core features")
+        if mobile_score < 30:
+            recommendations.append("CRITICAL: Mobile app essential - 80% of members expect mobile booking and account access")
+        if booking_score < 30:
+            recommendations.append("CRITICAL: Online booking system required - manual scheduling loses members")
+        
+        # High priority improvements (score < 50)
+        if website_score < 50:
+            recommendations.append("HIGH: Upgrade website features - add member portal, class schedules, and payment processing")
+        if mobile_score < 50:
+            recommendations.append("HIGH: Implement dedicated gym mobile app for member retention")
+        if booking_score < 50:
+            recommendations.append("HIGH: Improve online booking system - integrate with mobile app and payment processing")
+        if experience_score < 50:
+            recommendations.append("HIGH: Enhance member digital experience - mobile responsiveness and self-service features")
+        
+        # Medium priority improvements (score < 70)
+        if website_score < 70:
+            recommendations.append("MEDIUM: Add advanced website features - virtual classes, e-commerce, social integration")
+        if mobile_score < 70:
+            recommendations.append("MEDIUM: Upgrade mobile app platform for better member experience")
+        if experience_score < 70:
+            recommendations.append("MEDIUM: Implement member communication tools - live chat, notifications, community features")
+        
+        # Software-specific recommendations
+        detected_software = lead.get('gym_software_detected', [])
+        if not detected_software or all('WordPress' in software or 'Square' in software or 'Calendly' in software for software in detected_software):
+            recommendations.append("Consider comprehensive gym management software (MindBody, Glofox, or Zen Planner)")
+        
+        return recommendations[:8]  # Limit to top 8 recommendations
+    
+    def _identify_critical_gaps(self, scoring_components: Dict[str, Any], lead: Dict[str, Any]) -> List[str]:
+        """Identify critical gaps in digital infrastructure"""
+        gaps = []
+        
+        # Check for fundamental missing components
+        if scoring_components['website_features']['score'] < 40:
+            gaps.append("Website lacks essential gym features (scheduling, payments, member management)")
+        
+        if scoring_components['mobile_app_quality']['score'] < 30:
+            gaps.append("No mobile app or poor mobile experience for members")
+        
+        if scoring_components['online_booking']['score'] < 40:
+            gaps.append("Limited or no online booking capabilities")
+        
+        # Check for modern member expectations
+        website_features = lead.get('gym_website_features', {})
+        if not website_features.get('mobile_responsive', False):
+            gaps.append("Website not mobile-responsive (critical for member acquisition)")
+        
+        if not website_features.get('payment_processing', False):
+            gaps.append("No online payment processing (limits member convenience)")
+        
+        # Technology age issues
+        tech_age_score = lead.get('technology_age_score', 70)
+        if tech_age_score < 40:
+            gaps.append("Outdated technology stack affecting performance and security")
+        
+        # Software quality issues
+        gym_software_quality = lead.get('gym_software_quality_score', 50)
+        if gym_software_quality < 40:
+            gaps.append("Poor quality or outdated gym management software")
+        
+        return gaps
+    
+    def _calculate_digital_readiness(self, scoring_components: Dict[str, Any]) -> int:
+        """Calculate readiness for modern digital-first members"""
+        # Weight components for digital readiness (different from overall scoring)
+        mobile_weight = 0.4   # Mobile is critical for digital readiness
+        booking_weight = 0.3  # Online booking essential
+        experience_weight = 0.2  # User experience important
+        website_weight = 0.1  # Website less critical if mobile is excellent
+        
+        readiness = (
+            scoring_components['mobile_app_quality']['score'] * mobile_weight +
+            scoring_components['online_booking']['score'] * booking_weight +
+            scoring_components['member_experience']['score'] * experience_weight +
+            scoring_components['website_features']['score'] * website_weight
+        )
+        
+        return round(readiness)
+    
+    def _assess_competitive_position(self, overall_score: float) -> str:
+        """Assess competitive position based on digital infrastructure score"""
+        if overall_score >= 85:
+            return "Industry leader - digital infrastructure exceeds member expectations"
+        elif overall_score >= 70:
+            return "Competitive - good digital infrastructure with room for optimization"
+        elif overall_score >= 55:
+            return "Below average - digital infrastructure gaps may impact member acquisition"
+        elif overall_score >= 35:
+            return "Falling behind - significant digital infrastructure improvements needed"
+        else:
+            return "Critical disadvantage - digital infrastructure far below industry standards"
+    
+    def _analyze_gym_pain_factors(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze gym-specific pain factors for comprehensive scoring"""
+        pain_factors = {
+            'operational_inefficiencies': [],
+            'member_retention_risks': [],
+            'competitive_disadvantages': [],
+            'revenue_loss_factors': [],
+            'growth_limitations': [],
+            'pain_score': 0,
+            'primary_pain_category': '',
+            'urgency_level': 'low'
+        }
+        
+        try:
+            # Get relevant data
+            digital_score = lead.get('digital_infrastructure_score', 50)
+            website_features = lead.get('gym_website_features', {})
+            mobile_app = lead.get('gym_mobile_app', {})
+            gym_software = lead.get('gym_software_detected', [])
+            mobile_score = lead.get('mobile_score', 70)
+            tech_age_score = lead.get('technology_age_score', 70)
+            
+            # Operational Inefficiencies
+            if not website_features.get('online_booking', False):
+                pain_factors['operational_inefficiencies'].append({
+                    'factor': 'Manual booking process',
+                    'impact': 'Staff spends 15-20 hours/week on phone scheduling',
+                    'severity': 8
+                })
+            
+            if not website_features.get('payment_processing', False):
+                pain_factors['operational_inefficiencies'].append({
+                    'factor': 'Manual payment collection',
+                    'impact': 'Higher admin costs and delayed revenue',
+                    'severity': 7
+                })
+            
+            if not gym_software or all(sw in ['WordPress', 'Square', 'Calendly'] for sw in gym_software):
+                pain_factors['operational_inefficiencies'].append({
+                    'factor': 'No integrated gym management system',
+                    'impact': 'Multiple disconnected tools increase errors and time',
+                    'severity': 9
+                })
+            
+            # Member Retention Risks
+            if not mobile_app.get('has_app', False):
+                pain_factors['member_retention_risks'].append({
+                    'factor': 'No mobile app for members',
+                    'impact': '25% higher churn rate vs gyms with apps',
+                    'severity': 9
+                })
+            
+            if not website_features.get('member_portal', False):
+                pain_factors['member_retention_risks'].append({
+                    'factor': 'No self-service member portal',
+                    'impact': 'Members can\'t manage accounts 24/7',
+                    'severity': 7
+                })
+            
+            if mobile_score < 60:
+                pain_factors['member_retention_risks'].append({
+                    'factor': 'Poor mobile website experience',
+                    'impact': '40% of prospects abandon slow mobile sites',
+                    'severity': 8
+                })
+            
+            # Competitive Disadvantages
+            if digital_score < 50:
+                pain_factors['competitive_disadvantages'].append({
+                    'factor': 'Below-average digital infrastructure',
+                    'impact': 'Losing tech-savvy millennials to modern gyms',
+                    'severity': 8
+                })
+            
+            if not website_features.get('virtual_classes', False):
+                pain_factors['competitive_disadvantages'].append({
+                    'factor': 'No virtual/hybrid fitness options',
+                    'impact': 'Missing 30% of market seeking flexible options',
+                    'severity': 6
+                })
+            
+            if tech_age_score < 50:
+                pain_factors['competitive_disadvantages'].append({
+                    'factor': 'Outdated technology stack',
+                    'impact': 'Appears unprofessional vs modern competitors',
+                    'severity': 7
+                })
+            
+            # Revenue Loss Factors
+            if not website_features.get('ecommerce', False):
+                pain_factors['revenue_loss_factors'].append({
+                    'factor': 'No online merchandise/supplement sales',
+                    'impact': 'Missing $500-2000/month ancillary revenue',
+                    'severity': 5
+                })
+            
+            if not website_features.get('class_scheduling', False):
+                pain_factors['revenue_loss_factors'].append({
+                    'factor': 'No online class booking',
+                    'impact': 'Losing drop-in revenue from convenience seekers',
+                    'severity': 7
+                })
+            
+            if mobile_app.get('quality_score', 0) < 50:
+                pain_factors['revenue_loss_factors'].append({
+                    'factor': 'Poor quality mobile experience',
+                    'impact': 'Reduced member engagement and upgrades',
+                    'severity': 6
+                })
+            
+            # Growth Limitations
+            if not website_features.get('social_integration', False):
+                pain_factors['growth_limitations'].append({
+                    'factor': 'No social media integration',
+                    'impact': 'Missing viral marketing and referrals',
+                    'severity': 5
+                })
+            
+            if not website_features.get('live_chat', False):
+                pain_factors['growth_limitations'].append({
+                    'factor': 'No instant communication channel',
+                    'impact': 'Losing 20% of prospects who want immediate answers',
+                    'severity': 6
+                })
+            
+            # Calculate total pain score
+            all_pain_items = (
+                pain_factors['operational_inefficiencies'] +
+                pain_factors['member_retention_risks'] +
+                pain_factors['competitive_disadvantages'] +
+                pain_factors['revenue_loss_factors'] +
+                pain_factors['growth_limitations']
+            )
+            
+            if all_pain_items:
+                # Average severity weighted by category importance
+                operational_weight = 0.25
+                retention_weight = 0.30
+                competitive_weight = 0.20
+                revenue_weight = 0.15
+                growth_weight = 0.10
+                
+                operational_avg = sum(p['severity'] for p in pain_factors['operational_inefficiencies']) / max(1, len(pain_factors['operational_inefficiencies'])) if pain_factors['operational_inefficiencies'] else 0
+                retention_avg = sum(p['severity'] for p in pain_factors['member_retention_risks']) / max(1, len(pain_factors['member_retention_risks'])) if pain_factors['member_retention_risks'] else 0
+                competitive_avg = sum(p['severity'] for p in pain_factors['competitive_disadvantages']) / max(1, len(pain_factors['competitive_disadvantages'])) if pain_factors['competitive_disadvantages'] else 0
+                revenue_avg = sum(p['severity'] for p in pain_factors['revenue_loss_factors']) / max(1, len(pain_factors['revenue_loss_factors'])) if pain_factors['revenue_loss_factors'] else 0
+                growth_avg = sum(p['severity'] for p in pain_factors['growth_limitations']) / max(1, len(pain_factors['growth_limitations'])) if pain_factors['growth_limitations'] else 0
+                
+                weighted_score = (
+                    operational_avg * operational_weight +
+                    retention_avg * retention_weight +
+                    competitive_avg * competitive_weight +
+                    revenue_avg * revenue_weight +
+                    growth_avg * growth_weight
+                )
+                
+                pain_factors['pain_score'] = round(weighted_score * 10)  # Convert to 0-100 scale
+                
+                # Determine primary pain category
+                category_scores = {
+                    'operational_inefficiencies': operational_avg,
+                    'member_retention_risks': retention_avg,
+                    'competitive_disadvantages': competitive_avg,
+                    'revenue_loss_factors': revenue_avg,
+                    'growth_limitations': growth_avg
+                }
+                
+                if category_scores:
+                    pain_factors['primary_pain_category'] = max(category_scores, key=category_scores.get)
+                
+                # Determine urgency level
+                if pain_factors['pain_score'] >= 70:
+                    pain_factors['urgency_level'] = 'critical'
+                elif pain_factors['pain_score'] >= 50:
+                    pain_factors['urgency_level'] = 'high'
+                elif pain_factors['pain_score'] >= 30:
+                    pain_factors['urgency_level'] = 'medium'
+                else:
+                    pain_factors['urgency_level'] = 'low'
+            
+            # Add summary metrics
+            pain_factors['total_pain_points'] = len(all_pain_items)
+            pain_factors['critical_issues'] = len([p for p in all_pain_items if p['severity'] >= 8])
+            pain_factors['high_impact_issues'] = len([p for p in all_pain_items if p['severity'] >= 7])
+            
+            return pain_factors
+            
+        except Exception as e:
+            logger.error(f"Error analyzing gym pain factors: {e}")
+            return pain_factors
+
+    def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
+        """Get contextual software recommendations based on what was detected"""
+        recommendations = []
+        
+        # Check if no specialized gym software was detected
+        generic_software = ['wordpress', 'square', 'stripe', 'calendly']
+        has_only_generic = detected_software and all(any(generic in software_key for generic in generic_software) for software_key in detected_software)
+        
+        if not detected_software or has_only_generic:
+            recommendations.append("Consider implementing specialized gym management software")
+            recommendations.append("MindBody, Zen Planner, or Glofox recommended for comprehensive features")
+            return recommendations
+        
+        # Check for basic/generic solutions
+        basic_solutions = ['square', 'calendly', 'wordpress']
+        has_basic_only = any(basic in detected_software for basic in basic_solutions)
+        
+        if has_basic_only and len(detected_software) == 1:
+            recommendations.append("Current solution may be too basic for comprehensive gym management")
+            recommendations.append("Consider upgrading to specialized gym software for better member management")
+        
+        # Check for outdated solutions
+        outdated_solutions = ['abc_financial', 'perfect_gym']
+        has_outdated = any(outdated in detected_software for outdated in outdated_solutions)
+        
+        if has_outdated:
+            recommendations.append("URGENT: Outdated software detected - consider immediate upgrade")
+            recommendations.append("Modern alternatives: MindBody, WellnessLiving, or Glofox")
+        
+        return recommendations
     
     def analyze_website_performance(self, lead: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze website performance using PageSpeed Insights"""
@@ -169,7 +1675,60 @@ class LeadProcessor:
                 lead['technology_age_score'] = tech_analysis['age_score']
                 lead['technology_flags'] = tech_analysis['flags']
                 
+                # Perform gym software detection and analysis
+                gym_software_analysis = self._analyze_gym_software(technologies, website)
+                lead['gym_software_detected'] = gym_software_analysis['detected_software']
+                lead['gym_software_scores'] = gym_software_analysis['software_scores']
+                lead['gym_software_quality_score'] = gym_software_analysis['overall_quality_score']
+                lead['gym_software_recommendations'] = gym_software_analysis['recommendations']
+                lead['gym_software_red_flags'] = gym_software_analysis['red_flags']
+                
+                # Perform gym website feature analysis
+                website_feature_analysis = self._analyze_gym_website_features(website, technologies)
+                lead['gym_website_features'] = website_feature_analysis['detected_features']
+                lead['gym_website_feature_score'] = website_feature_analysis['feature_score']
+                lead['gym_website_feature_indicators'] = website_feature_analysis['feature_indicators']
+                lead['gym_website_missing_features'] = website_feature_analysis['missing_features']
+                lead['gym_website_feature_recommendations'] = website_feature_analysis['recommendations']
+                lead['gym_website_implemented_features'] = website_feature_analysis['implemented_count']
+                
+                # Perform gym mobile app analysis
+                mobile_app_analysis = self._analyze_gym_mobile_app(lead['business_name'], website, gym_software_analysis['detected_software'])
+                lead['gym_mobile_app_available'] = mobile_app_analysis['has_mobile_app']
+                lead['gym_mobile_app_platforms'] = mobile_app_analysis['app_platforms']
+                lead['gym_mobile_app_quality_score'] = mobile_app_analysis['app_quality_score']
+                lead['gym_mobile_app_quality_issues'] = mobile_app_analysis['app_quality_issues']
+                lead['gym_mobile_app_recommendations'] = mobile_app_analysis['app_recommendations']
+                lead['gym_mobile_app_detection_method'] = mobile_app_analysis['detection_method']
+                
+                # Calculate comprehensive digital infrastructure score
+                digital_infrastructure_analysis = self._calculate_digital_infrastructure_score(lead)
+                lead['gym_digital_infrastructure_score'] = digital_infrastructure_analysis['overall_score']
+                lead['gym_digital_infrastructure_tier'] = digital_infrastructure_analysis['tier']
+                lead['gym_digital_infrastructure_description'] = digital_infrastructure_analysis['tier_description']
+                lead['gym_digital_component_scores'] = digital_infrastructure_analysis['component_scores']
+                lead['gym_digital_weighted_contributions'] = digital_infrastructure_analysis['weighted_contributions']
+                lead['gym_digital_readiness'] = digital_infrastructure_analysis['digital_readiness']
+                lead['gym_digital_infrastructure_recommendations'] = digital_infrastructure_analysis['improvement_recommendations']
+                lead['gym_digital_critical_gaps'] = digital_infrastructure_analysis['critical_gaps']
+                lead['gym_digital_competitive_analysis'] = digital_infrastructure_analysis['competitive_analysis']
+                
+                # Analyze gym-specific pain factors
+                gym_pain_analysis = self._analyze_gym_pain_factors(lead)
+                lead['gym_pain_factors'] = gym_pain_analysis
+                lead['gym_pain_score'] = gym_pain_analysis['pain_score']
+                lead['gym_pain_urgency'] = gym_pain_analysis['urgency_level']
+                lead['gym_primary_pain_category'] = gym_pain_analysis['primary_pain_category']
+                lead['gym_total_pain_points'] = gym_pain_analysis['total_pain_points']
+                lead['gym_critical_pain_issues'] = gym_pain_analysis['critical_issues']
+                
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
+                if gym_software_analysis['detected_software']:
+                    logger.info(f"Gym software detected: {', '.join(gym_software_analysis['detected_software'])}")
+                logger.info(f"Website features detected for {lead['business_name']}: {website_feature_analysis['implemented_count']}/{website_feature_analysis['total_features']} features (score: {website_feature_analysis['feature_score']})")
+                logger.info(f"Mobile app analysis for {lead['business_name']}: {'Available' if mobile_app_analysis['has_mobile_app'] else 'Not available'} (quality: {mobile_app_analysis['app_quality_score']})")
+                logger.info(f"Digital infrastructure score for {lead['business_name']}: {digital_infrastructure_analysis['overall_score']}/100 ({digital_infrastructure_analysis['tier']}) - Readiness: {digital_infrastructure_analysis['digital_readiness']}/100")
+                logger.info(f"Gym pain analysis for {lead['business_name']}: pain_score={gym_pain_analysis['pain_score']}, urgency={gym_pain_analysis['urgency_level']}, primary_category={gym_pain_analysis['primary_pain_category']}")
             
             return lead
             
@@ -206,6 +1765,9 @@ class LeadProcessor:
         
         # Step 4: Capture screenshots for RED leads
         self._capture_screenshots_for_red_leads(processed_leads)
+        
+        # Step 5: Extract logos for RED leads
+        self._extract_logos_for_red_leads(processed_leads)
         
         # Generate comprehensive scoring dashboard
         self._generate_scoring_dashboard(processed_leads)
@@ -246,6 +1808,58 @@ class LeadProcessor:
                 if not lead.get('screenshot_url'):
                     lead['screenshot_url'] = 'FAILED'
                     lead['error_notes'] = lead.get('error_notes', '') + ' Screenshot capture failed;'
+    
+    def _extract_logos_for_red_leads(self, leads: List[Dict[str, Any]]) -> None:
+        """Extract logos for all RED leads"""
+        red_leads = [lead for lead in leads if lead.get('status') == 'red']
+        
+        if not red_leads:
+            logger.info("No RED leads found - skipping logo extraction")
+            return
+        
+        logger.info(f"Starting logo extraction for {len(red_leads)} RED leads")
+        
+        try:
+            # Process logos for RED leads
+            processed_leads = self.logo_extractor.process_leads_for_logos(red_leads)
+            
+            # Update leads with logo information
+            for i, lead in enumerate(red_leads):
+                processed_lead = processed_leads[i]
+                
+                # Copy logo information to the original lead
+                lead['logo_url'] = processed_lead.get('logo_url', '')
+                lead['logo_extraction_method'] = processed_lead.get('logo_extraction_method', 'failed')
+                lead['logo_fallback_generated'] = processed_lead.get('logo_fallback_generated', False)
+                lead['logo_quality_score'] = processed_lead.get('logo_quality_score', 0)
+                lead['logo_valid'] = processed_lead.get('logo_valid', False)
+                
+                # Merge any additional error notes
+                if processed_lead.get('error_notes'):
+                    existing_errors = lead.get('error_notes', '')
+                    if existing_errors and not existing_errors.endswith(';'):
+                        existing_errors += ';'
+                    lead['error_notes'] = existing_errors + ' ' + processed_lead['error_notes']
+                
+                logger.info(f"Logo processed for {lead['business_name']}: {lead['logo_extraction_method']}")
+            
+            successful_extractions = sum(1 for lead in red_leads if lead.get('logo_url'))
+            fallback_generated = sum(1 for lead in red_leads if lead.get('logo_fallback_generated'))
+            
+            logger.info(f"Logo extraction completed: {successful_extractions}/{len(red_leads)} successful, {fallback_generated} fallbacks generated")
+            
+        except Exception as e:
+            logger.error(f"Error during logo extraction process: {e}")
+            # Mark all RED leads as having failed logo extraction
+            for lead in red_leads:
+                if not lead.get('logo_url'):
+                    lead['logo_url'] = ''
+                    lead['logo_extraction_method'] = 'failed'
+                    lead['logo_fallback_generated'] = False
+                    error_notes = lead.get('error_notes', '')
+                    if error_notes and not error_notes.endswith(';'):
+                        error_notes += ';'
+                    lead['error_notes'] = error_notes + ' Logo extraction failed;'
     
     def _generate_scoring_dashboard(self, leads: List[Dict[str, Any]]) -> None:
         """Generate scoring dashboard and analytics"""
@@ -469,11 +2083,14 @@ class LeadProcessor:
             technology_age_score = lead.get('technology_age_score', 50) or 50
             outdated_technologies = lead.get('outdated_technologies', [])
             technology_flags = lead.get('technology_flags', [])
+            gym_software_quality_score = lead.get('gym_software_quality_score', 50) or 50
+            gym_software_red_flags = lead.get('gym_software_red_flags', [])
             
             # Pain scoring weights (higher = more pain/worse)
-            MOBILE_WEIGHT = 0.6  # 60% weight on mobile performance
-            TECH_AGE_WEIGHT = 0.3  # 30% weight on technology age
+            MOBILE_WEIGHT = 0.4  # 40% weight on mobile performance
+            TECH_AGE_WEIGHT = 0.2  # 20% weight on technology age
             TECH_FLAGS_WEIGHT = 0.1  # 10% weight on critical tech flags
+            GYM_SOFTWARE_WEIGHT = 0.3  # 30% weight on gym software quality
             
             # Calculate pain scores (0-100, where 100 = maximum pain)
             mobile_pain_score = 100 - mobile_score  # Invert mobile score
@@ -489,11 +2106,21 @@ class LeadProcessor:
                 # Score based on severity and count
                 tech_flags_pain_score = min(100, (critical_flags * 30) + (warning_flags * 15) + (problem_flags * 20))
             
+            # Gym software pain score (inverted - lower quality = higher pain)
+            gym_software_pain_score = 100 - gym_software_quality_score
+            
+            # Add bonus pain for gym software red flags
+            if gym_software_red_flags:
+                critical_software_flags = sum(1 for flag in gym_software_red_flags if 'CRITICAL' in str(flag))
+                standard_software_flags = len(gym_software_red_flags) - critical_software_flags
+                gym_software_pain_score += min(30, (critical_software_flags * 20) + (standard_software_flags * 10))
+            
             # Calculate overall pain score
             overall_pain_score = (
                 (mobile_pain_score * MOBILE_WEIGHT) +
                 (tech_age_pain_score * TECH_AGE_WEIGHT) +
-                (tech_flags_pain_score * TECH_FLAGS_WEIGHT)
+                (tech_flags_pain_score * TECH_FLAGS_WEIGHT) +
+                (gym_software_pain_score * GYM_SOFTWARE_WEIGHT)
             )
             
             # Determine pain level and final status
@@ -523,12 +2150,14 @@ class LeadProcessor:
                 'mobile_pain': round(mobile_pain_score, 1),
                 'tech_age_pain': round(tech_age_pain_score, 1),
                 'tech_flags_pain': round(tech_flags_pain_score, 1),
+                'gym_software_pain': round(gym_software_pain_score, 1),
                 'overall_pain': round(overall_pain_score, 1),
                 'pain_level': pain_level,
                 'scoring_weights': {
                     'mobile': MOBILE_WEIGHT,
                     'tech_age': TECH_AGE_WEIGHT,
-                    'tech_flags': TECH_FLAGS_WEIGHT
+                    'tech_flags': TECH_FLAGS_WEIGHT,
+                    'gym_software': GYM_SOFTWARE_WEIGHT
                 }
             }
             
@@ -546,6 +2175,10 @@ class LeadProcessor:
                 pain_factors.append(f"Outdated technology stack (age score: {technology_age_score})")
             if tech_flags_pain_score > 20:
                 pain_factors.append(f"Critical technology issues ({len(outdated_technologies)} outdated)")
+            if gym_software_pain_score > 50:
+                pain_factors.append(f"Poor gym software quality (score: {gym_software_quality_score})")
+            if gym_software_red_flags:
+                pain_factors.append(f"Gym software issues ({len(gym_software_red_flags)} red flags)")
             
             lead['pain_factors'] = pain_factors
             
@@ -574,7 +2207,15 @@ class LeadProcessor:
                 'rating', 'reviews', 'google_business_url', 'place_id', 
                 'latitude', 'longitude', 'technologies', 'outdated_technologies', 
                 'technology_age_score', 'technology_flags', 'pain_breakdown',
-                'screenshot_url', 'logo_url', 'pdf_url', 'error_notes'
+                # Gym-specific fields
+                'gym_type', 'gym_size_estimate', 'gym_size_confidence', 'gym_size_factors', 'gym_services', 'gym_location_type',
+                'gym_membership_model', 'gym_equipment_types', 'gym_operating_hours',
+                'gym_pricing_indicators', 'gym_target_demographic', 'gym_franchise_chain',
+                'gym_years_in_business', 'gym_staff_size_estimate', 'gym_digital_presence_score',
+                'gym_software_needs_score', 'gym_software_detected', 'gym_software_scores',
+                'gym_software_quality_score', 'gym_software_recommendations', 'gym_software_red_flags',
+                'screenshot_url', 'logo_url', 'logo_extraction_method', 'logo_fallback_generated', 
+                'logo_quality_score', 'logo_valid', 'pdf_url', 'error_notes'
             ]
             
             # Only include columns that exist in the DataFrame

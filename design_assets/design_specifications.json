@@ -1,0 +1,69 @@
+{
+  "brand_colors": {
+    "primary_red": "#E74C3C",
+    "authority_blue": "#2C3E50",
+    "success_green": "#27AE60",
+    "body_gray": "#34495E",
+    "support_gray": "#7F8C8D",
+    "light_gray": "#BDC3C7",
+    "background": "#ECF0F1",
+    "white": "#FFFFFF"
+  },
+  "typography": {
+    "primary_font": "Poppins",
+    "font_weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semi_bold": 600,
+      "bold": 700
+    },
+    "font_sizes": {
+      "main_title": 28,
+      "business_name": 22,
+      "section_header": 18,
+      "body_text": 14,
+      "pain_points": 14,
+      "cta": 18,
+      "supporting": 12
+    }
+  },
+  "layout": {
+    "page_size": {
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9"
+    },
+    "zones": {
+      "header_height": 120,
+      "content_height": 840,
+      "footer_height": 120
+    },
+    "margins": {
+      "outer": 60,
+      "inner": 40,
+      "safe_zone": 40
+    },
+    "columns": {
+      "left_width": 1152,
+      "right_width": 648,
+      "gutter": 40
+    }
+  },
+  "placeholder_mapping": {
+    "text_placeholders": [
+      "{{BUSINESS_NAME}}",
+      "{{MOBILE_SCORE}}",
+      "{{PAIN_POINT_1}}",
+      "{{PAIN_POINT_2}}",
+      "{{PAIN_POINT_3}}",
+      "{{BUSINESS_PHONE}}",
+      "{{BUSINESS_WEBSITE}}"
+    ],
+    "image_placeholders": [
+      "{{WEBSITE_SCREENSHOT}}",
+      "{{BUSINESS_LOGO}}",
+      "{{COMPANY_LOGO}}"
+    ]
+  }
+}

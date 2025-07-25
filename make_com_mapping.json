@@ -1,0 +1,72 @@
+{
+  "google_slides_placeholders": {
+    "BUSINESS_NAME": {
+      "source": "google_sheets.business_name",
+      "type": "text",
+      "max_length": 50,
+      "required": true
+    },
+    "MOBILE_SCORE": {
+      "source": "pagespeed_insights.mobile_score",
+      "type": "number",
+      "format": "XX",
+      "conditional_formatting": {
+        "background_color": {
+          "condition": "< 60",
+          "true_value": "#E74C3C",
+          "false_value": "#27AE60"
+        }
+      },
+      "required": true
+    },
+    "PAIN_POINT_1": {
+      "source": "pain_point_generator.point_1",
+      "type": "text",
+      "max_length": 80,
+      "required": true
+    },
+    "PAIN_POINT_2": {
+      "source": "pain_point_generator.point_2",
+      "type": "text",
+      "max_length": 80,
+      "required": true
+    },
+    "PAIN_POINT_3": {
+      "source": "pain_point_generator.point_3",
+      "type": "text",
+      "max_length": 80,
+      "required": true
+    },
+    "BUSINESS_PHONE": {
+      "source": "google_sheets.phone",
+      "type": "text",
+      "format": "(XXX) XXX-XXXX",
+      "required": false
+    },
+    "BUSINESS_WEBSITE": {
+      "source": "google_sheets.website",
+      "type": "text",
+      "format": "www.example.com",
+      "required": false
+    },
+    "WEBSITE_SCREENSHOT": {
+      "source": "cloud_storage.screenshot_url",
+      "type": "image",
+      "format": "PNG/JPEG",
+      "required": true
+    },
+    "BUSINESS_LOGO": {
+      "source": "logo_processor.logo_url",
+      "type": "image",
+      "format": "PNG",
+      "fallback": "generated_logo",
+      "required": false
+    },
+    "COMPANY_LOGO": {
+      "source": "static_assets.company_logo",
+      "type": "image",
+      "format": "PNG",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,191 @@
+# Gym Management Software Lead Generation System
+## Project Name: Gym Software Pain-Gap Audit Automation
+### Version: 1.0
+### Date: January 27, 2025
+### Status: Ready for Development
+
+## 1. Overview & Business Goal
+This document outlines the requirements for retrofitting the existing Pain-Gap Audit automation system to identify and qualify gym and fitness business leads for gym management software sales. The primary business goal is to generate high-volume lists of qualified gym leads with poor digital infrastructure, creating personalized "Gym Software Pain-Gap Audits" at scale.
+
+## 2. Target User & Persona
+- **Primary User**: Gym Management Software Sales Team
+- **Secondary User**: Virtual Assistant (VA) for follow-up calls
+- **Target Market**: Gym owners and managers with poor digital infrastructure
+
+## 3. Functional Requirements (User Stories)
+
+### EPIC 1: Gym-Specific Lead Ingestion & Scraping
+**User Story 1.1**: As the sales team, I want to scrape Google Maps for gym and fitness businesses across target cities.
+**User Story 1.2**: As the sales team, I want to extract gym-specific data including class schedules, membership info, and trainer listings.
+
+**Acceptance Criteria**:
+- Scrape gym categories: "gym", "fitness center", "health club", "personal training", "crossfit", "yoga studio", "pilates studio", "boxing gym", "martial arts school", "dance studio", "swimming pool"
+- Extract: Business Name, Website URL, Phone Number, Google Business Profile Link, Physical Address, Gym Size Indicators, Services Offered
+- Output to CSV/Google Sheets format
+
+### EPIC 2: Gym Digital Portfolio Analysis
+**User Story 2.1**: As the sales team, I want to analyze each gym's website for existing management software platforms.
+**User Story 2.2**: As the sales team, I want to detect booking systems, member portals, and payment processing capabilities.
+**User Story 2.3**: As the sales team, I want to analyze mobile app presence and quality.
+
+**Acceptance Criteria**:
+- Detect existing gym management platforms (MindBody, Zen Planner, Wodify, TeamUp, etc.)
+- Identify booking system presence and sophistication
+- Analyze member portal functionality
+- Check mobile app availability (iOS/Android) and quality
+- Assess payment processing integration
+
+### EPIC 3: Gym-Specific Pain Scoring
+**User Story 3.1**: As the sales team, I want to score gyms based on their digital infrastructure gaps.
+**User Story 3.2**: As the sales team, I want to identify gyms most likely to need management software upgrades.
+
+**Acceptance Criteria**:
+- Score based on management software gaps (40% weight)
+- Score based on mobile app quality (30% weight)
+- Score based on website performance (20% weight)
+- Score based on booking system sophistication (10% weight)
+- Tag leads as "RED" if pain score indicates high upgrade likelihood
+
+### EPIC 4: Gym Software Audit Generation
+**User Story 4.1**: For every "RED" gym lead, I want to automatically generate a gym-specific PDF audit.
+
+**Acceptance Criteria**:
+- Take full-page screenshot of gym's current website
+- Extract gym logo or generate fallback
+- Create gym-specific pain points analysis
+- Include gym management software ROI calculations
+- Generate personalized gym software recommendations
+
+## 4. Non-Functional Requirements
+- **Performance**: Process 200+ gym leads per day to generate 50+ "RED" audits
+- **Cost**: Keep cost per "RED" lead under $0.50
+- **Reliability**: Handle API failures, missing websites, and broken URLs gracefully
+- **Usability**: Clean output format for VA follow-up calls
+
+## 5. Technical Stack & Implementation Plan
+- **Scraping**: SerpApi Google Maps Organic Results (existing)
+- **Website Analysis**: PageSpeed Insights API, BuiltWith API (existing)
+- **Gym Software Detection**: Enhanced BuiltWith analysis + custom detection logic
+- **Mobile App Analysis**: App Store API integration for iOS/Android app detection
+- **PDF Generation**: Google Slides template + Make.com automation (existing)
+- **Data Storage**: Google Sheets (existing)
+
+## 6. Gym-Specific Data Fields
+### Enhanced Lead Data Structure
+- Business Name, Website URL, Phone, Address (existing)
+- **Gym-Specific Fields**:
+  - Gym Size Indicator (single location, multi-location, franchise)
+  - Services Offered (personal training, group classes, specialty programs)
+  - Current Management Software (MindBody, Zen Planner, Wodify, etc.)
+  - Booking System Present (Yes/No)
+  - Member Portal Present (Yes/No)
+  - Mobile App Present (Yes/No)
+  - Payment Processing Integration (Yes/No)
+  - Class Schedule Management (Yes/No)
+  - Trainer Management System (Yes/No)
+  - Member Check-in System (Yes/No)
+
+### Gym Pain Scoring Algorithm
+- **Management Software Gaps (40%)**: No software = 100 pain, outdated software = 60-80 pain
+- **Mobile App Quality (30%)**: No app = 100 pain, poor app = 60-80 pain
+- **Website Performance (20%)**: Mobile score < 60 = 100 pain
+- **Booking System (10%)**: No online booking = 100 pain, basic booking = 50 pain
+
+## 7. Gym Software Detection Strategy
+### BuiltWith API Enhancement
+- Detect gym management platforms in technology stack
+- Identify booking and payment processing systems
+- Analyze e-commerce and membership management tools
+
+### Custom Detection Logic
+- Scan website content for gym management software keywords
+- Check for booking forms and member portals
+- Analyze URL structures for common gym software patterns
+- Detect mobile app links and app store references
+
+### App Store Analysis
+- Search iOS App Store for gym's mobile app
+- Search Google Play Store for gym's mobile app
+- Analyze app ratings, reviews, and update frequency
+- Detect app quality indicators
+
+## 8. Gym-Specific Pain Points
+### Primary Pain Points
+1. **No Online Booking System**: Members can't book classes online
+2. **Poor Member Management**: Manual member tracking and billing
+3. **No Mobile App**: Members can't access services on mobile
+4. **Outdated Management Software**: Using old, unsupported platforms
+5. **Poor Payment Processing**: Manual payment collection and tracking
+6. **No Class Schedule Management**: Manual class scheduling and updates
+7. **Poor Trainer Management**: No system for trainer scheduling and payments
+8. **No Member Check-in System**: Manual attendance tracking
+
+### Secondary Pain Points
+1. **Poor Website Performance**: Slow loading times affecting member experience
+2. **No Member Portal**: Members can't access account information online
+3. **Poor Communication Tools**: No automated member communication system
+4. **No Analytics**: No insights into gym performance and member behavior
+5. **Poor Integration**: Systems don't work together seamlessly
+
+## 9. Gym Software Value Proposition
+### ROI Calculations
+- **Time Savings**: Automated booking saves 10-15 hours per week
+- **Revenue Increase**: Online booking increases class attendance by 20-30%
+- **Member Retention**: Better member experience increases retention by 15-25%
+- **Staff Efficiency**: Automated systems reduce administrative workload by 40-60%
+
+### Competitive Advantages
+- **All-in-One Solution**: Single platform for all gym management needs
+- **Mobile-First Design**: Modern mobile app for members and staff
+- **Advanced Analytics**: Insights into gym performance and member behavior
+- **Seamless Integration**: All systems work together seamlessly
+- **24/7 Access**: Members can access services anytime, anywhere
+
+## 10. Success Metrics
+- **Output**: ≥ 50 "RED" gym lead audits generated per day
+- **Cost**: Cost per generated "RED" lead under $0.50
+- **Quality**: 80%+ of RED leads should have genuine management software gaps
+- **Conversion**: Target 5-10% conversion rate from audit to software demo
+
+## 11. Implementation Phases
+### Phase 1: Core Gym Lead Scraping (Week 1-2)
+- Update search categories for gym and fitness businesses
+- Enhance lead data structure with gym-specific fields
+- Test scraping with gym categories
+
+### Phase 2: Gym Software Detection (Week 2-3)
+- Enhance BuiltWith analysis for gym management platforms
+- Implement custom detection logic for gym software
+- Add mobile app analysis capabilities
+
+### Phase 3: Gym-Specific Pain Scoring (Week 3-4)
+- Implement gym-specific pain scoring algorithm
+- Test scoring with sample gym data
+- Refine scoring weights based on results
+
+### Phase 4: Gym Audit Template (Week 4-5)
+- Create gym-specific PDF template
+- Include gym management software pain points
+- Add gym software ROI calculations
+
+### Phase 5: Integration & Testing (Week 5-6)
+- Integrate all components
+- End-to-end testing with gym leads
+- Performance optimization
+
+## 12. Risks and Mitigations
+### Technical Risks
+- **API Rate Limits**: Implement exponential backoff and caching
+- **Gym Software Detection Accuracy**: Use multiple detection methods and manual validation
+- **Mobile App Analysis Complexity**: Start with basic detection, enhance over time
+
+### Business Risks
+- **Low Gym Software Adoption**: Focus on gyms with clear digital infrastructure gaps
+- **High Competition**: Emphasize unique value proposition and ROI
+- **Seasonal Variations**: Target gyms year-round, focus on upgrade cycles
+
+## 13. Future Enhancements
+- **Advanced Analytics**: Machine learning for better lead scoring
+- **Competitor Analysis**: Compare gym's current software with alternatives
+- **Expansion Indicators**: Identify gyms likely to expand and need better systems
+- **Integration Opportunities**: Detect gyms using multiple disconnected systems 
