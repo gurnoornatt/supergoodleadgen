@@ -1,0 +1,76 @@
+{
+  "cloud_urls": {
+    "https://example.com": "https://drive.google.com/file/d/FAKE_6d32967e43a1f316ad1d094b56889a97/view?usp=sharing",
+    "https://httpbin.org/html": "https://drive.google.com/file/d/FAKE_b6fb57b3bd029f81b95264d545cc5ed6/view?usp=sharing"
+  },
+  "upload_metadata": {
+    "https://example.com": {
+      "file_id": "FAKE_6d32967e43a1f316ad1d094b56889a97",
+      "drive_filename": "Demo_Restaurant_example.com_1753471516.png",
+      "business_name": "Demo Restaurant",
+      "original_url": "https://example.com",
+      "local_path": "screenshots/playwright_example.com_1753471516.png",
+      "upload_timestamp": 1753471517.422984,
+      "upload_time_iso": "2025-07-25 12:25:17",
+      "file_size": 673,
+      "cloud_provider": "google_drive_simulation",
+      "folder_id": "FAKE_FOLDER",
+      "public_access": false,
+      "cloud_url": "https://drive.google.com/file/d/FAKE_6d32967e43a1f316ad1d094b56889a97/view?usp=sharing",
+      "api_method": "simulation_fallback",
+      "warning": "This is a simulated upload - URL will not work"
+    },
+    "https://httpbin.org/html": {
+      "file_id": "FAKE_b6fb57b3bd029f81b95264d545cc5ed6",
+      "drive_filename": "Test_Gym_httpbin.org_1753471517.png",
+      "business_name": "Test Gym",
+      "original_url": "https://httpbin.org/html",
+      "local_path": "screenshots/playwright_httpbin.org_1753471516.png",
+      "upload_timestamp": 1753471517.694446,
+      "upload_time_iso": "2025-07-25 12:25:17",
+      "file_size": 683,
+      "cloud_provider": "google_drive_simulation",
+      "folder_id": "FAKE_FOLDER",
+      "public_access": false,
+      "cloud_url": "https://drive.google.com/file/d/FAKE_b6fb57b3bd029f81b95264d545cc5ed6/view?usp=sharing",
+      "api_method": "simulation_fallback",
+      "warning": "This is a simulated upload - URL will not work"
+    }
+  },
+  "failed_uploads": [],
+  "validation_results": {
+    "https://example.com": {
+      "is_valid": false,
+      "issues": [
+        "File too small: 673 bytes"
+      ],
+      "warnings": [],
+      "file_info": {
+        "size_bytes": 673,
+        "format": ".png"
+      },
+      "business_name": "Demo Restaurant"
+    },
+    "https://httpbin.org/html": {
+      "is_valid": false,
+      "issues": [
+        "File too small: 683 bytes"
+      ],
+      "warnings": [],
+      "file_info": {
+        "size_bytes": 683,
+        "format": ".png"
+      },
+      "business_name": "Test Gym"
+    }
+  },
+  "summary": {
+    "total_processed": 2,
+    "successful_uploads": 2,
+    "failed_uploads": 0,
+    "upload_success_rate": 100.0,
+    "valid_files": 0,
+    "file_validation_rate": 0.0,
+    "processing_timestamp": "2025-07-25 12:25:17"
+  }
+}

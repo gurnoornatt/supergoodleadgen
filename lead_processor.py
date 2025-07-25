@@ -1762,6 +1762,247 @@ class LeadProcessor:
                 'adjusted_urgency': pain_factors.get('urgency_level', 'low'),
                 'error': str(e)
             }
+    
+    def _apply_gym_specific_red_green_classification(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply gym-specific RED/GREEN classification based on comprehensive analysis"""
+        try:
+            # Extract all relevant scores and factors
+            gym_adjusted_pain_score = lead.get('gym_adjusted_pain_score', 50)
+            gym_adjusted_urgency = lead.get('gym_adjusted_urgency', 'medium')
+            digital_infrastructure_score = lead.get('gym_digital_infrastructure_score', 50)
+            digital_tier = lead.get('gym_digital_infrastructure_tier', 'Poor')
+            software_quality_score = lead.get('gym_software_quality_score', 50)
+            website_feature_score = lead.get('gym_website_feature_score', 50)
+            mobile_app_quality = lead.get('gym_mobile_app_quality_score', 0)
+            mobile_score = lead.get('mobile_score', 50)
+            gym_size = lead.get('gym_size_estimate', 'medium')
+            gym_type = lead.get('gym_type', 'traditional_gym')
+            threshold_violations = lead.get('gym_threshold_violations', [])
+            
+            # Initialize classification data
+            classification_data = {
+                'gym_classification': 'green',
+                'gym_classification_confidence': 'high',
+                'gym_classification_reasons': [],
+                'gym_action_priority': 'low',
+                'gym_sales_readiness': 'not_ready'
+            }
+            
+            # Define RED criteria specific to gyms
+            red_criteria = []
+            yellow_criteria = []
+            
+            # 1. Adjusted pain score criteria (most important)
+            if gym_adjusted_pain_score >= 70:
+                red_criteria.append({
+                    'factor': 'High gym-specific pain score',
+                    'detail': f'Adjusted pain score of {gym_adjusted_pain_score:.1f} indicates severe operational challenges',
+                    'weight': 'critical'
+                })
+            elif gym_adjusted_pain_score >= 50:
+                yellow_criteria.append({
+                    'factor': 'Moderate gym-specific pain score',
+                    'detail': f'Adjusted pain score of {gym_adjusted_pain_score:.1f} shows significant improvement opportunities',
+                    'weight': 'important'
+                })
+            
+            # 2. Urgency level criteria
+            if gym_adjusted_urgency == 'critical':
+                red_criteria.append({
+                    'factor': 'Critical urgency level',
+                    'detail': 'Multiple critical pain points requiring immediate attention',
+                    'weight': 'critical'
+                })
+            elif gym_adjusted_urgency == 'high':
+                yellow_criteria.append({
+                    'factor': 'High urgency level',
+                    'detail': 'Several important pain points that need addressing',
+                    'weight': 'important'
+                })
+            
+            # 3. Digital infrastructure criteria
+            if digital_tier in ['Very Poor', 'Poor'] or digital_infrastructure_score < 40:
+                red_criteria.append({
+                    'factor': 'Poor digital infrastructure',
+                    'detail': f'{digital_tier} tier ({digital_infrastructure_score}/100) - severely behind competitors',
+                    'weight': 'critical'
+                })
+            elif digital_tier == 'Fair' or digital_infrastructure_score < 60:
+                yellow_criteria.append({
+                    'factor': 'Fair digital infrastructure',
+                    'detail': f'{digital_tier} tier ({digital_infrastructure_score}/100) - needs modernization',
+                    'weight': 'moderate'
+                })
+            
+            # 4. Mobile performance for gyms (critical for member experience)
+            if mobile_score < 50:
+                red_criteria.append({
+                    'factor': 'Poor mobile performance',
+                    'detail': f'Mobile score {mobile_score}/100 - critical for member engagement',
+                    'weight': 'critical'
+                })
+            elif mobile_score < 70:
+                yellow_criteria.append({
+                    'factor': 'Subpar mobile performance',
+                    'detail': f'Mobile score {mobile_score}/100 - below member expectations',
+                    'weight': 'important'
+                })
+            
+            # 5. Gym software quality
+            if software_quality_score < 40:
+                red_criteria.append({
+                    'factor': 'Poor gym management software',
+                    'detail': f'Software quality score {software_quality_score}/100 - major operational inefficiencies',
+                    'weight': 'critical'
+                })
+            elif software_quality_score < 60:
+                yellow_criteria.append({
+                    'factor': 'Outdated gym management software',
+                    'detail': f'Software quality score {software_quality_score}/100 - limiting growth potential',
+                    'weight': 'important'
+                })
+            
+            # 6. Critical threshold violations
+            if len(threshold_violations) >= 3:
+                red_criteria.append({
+                    'factor': 'Multiple critical violations',
+                    'detail': f'{len(threshold_violations)} critical thresholds violated for {gym_size} {gym_type}',
+                    'weight': 'critical'
+                })
+            elif len(threshold_violations) >= 1:
+                yellow_criteria.append({
+                    'factor': 'Critical threshold violations',
+                    'detail': f'{len(threshold_violations)} threshold(s) below expectations for {gym_size} {gym_type}',
+                    'weight': 'important'
+                })
+            
+            # 7. Website feature completeness for gyms
+            if website_feature_score < 30:
+                red_criteria.append({
+                    'factor': 'Missing critical website features',
+                    'detail': f'Only {website_feature_score}% of essential gym website features implemented',
+                    'weight': 'critical'
+                })
+            elif website_feature_score < 60:
+                yellow_criteria.append({
+                    'factor': 'Incomplete website features',
+                    'detail': f'{website_feature_score}% of gym website features - missing key member tools',
+                    'weight': 'moderate'
+                })
+            
+            # 8. Mobile app availability (important for modern gyms)
+            has_mobile_app = lead.get('gym_mobile_app', {}).get('has_app', False)
+            if gym_size == 'large' and not has_mobile_app:
+                red_criteria.append({
+                    'factor': 'No mobile app for large gym',
+                    'detail': 'Large gyms require mobile apps for competitive member experience',
+                    'weight': 'critical'
+                })
+            elif gym_type in ['boutique_fitness', 'crossfit'] and not has_mobile_app:
+                yellow_criteria.append({
+                    'factor': 'No mobile app for tech-forward gym type',
+                    'detail': f'{gym_type.replace("_", " ").title()} typically benefits from mobile apps',
+                    'weight': 'important'
+                })
+            
+            # Determine final classification
+            critical_red_factors = sum(1 for r in red_criteria if r['weight'] == 'critical')
+            total_red_factors = len(red_criteria)
+            total_yellow_factors = len(yellow_criteria)
+            
+            if critical_red_factors >= 2 or total_red_factors >= 3:
+                classification_data['gym_classification'] = 'red'
+                classification_data['gym_action_priority'] = 'urgent'
+                classification_data['gym_sales_readiness'] = 'hot_lead'
+                classification_data['gym_classification_reasons'] = [r['detail'] for r in red_criteria[:5]]  # Top 5 reasons
+                
+                # Adjust confidence based on number of factors
+                if critical_red_factors >= 3:
+                    classification_data['gym_classification_confidence'] = 'very_high'
+                elif critical_red_factors >= 2:
+                    classification_data['gym_classification_confidence'] = 'high'
+                else:
+                    classification_data['gym_classification_confidence'] = 'medium'
+                    
+            elif total_red_factors >= 1 or total_yellow_factors >= 3:
+                classification_data['gym_classification'] = 'yellow'
+                classification_data['gym_action_priority'] = 'medium'
+                classification_data['gym_sales_readiness'] = 'warm_lead'
+                
+                # Combine top red and yellow reasons
+                reasons = [r['detail'] for r in red_criteria[:2]]
+                reasons.extend([y['detail'] for y in yellow_criteria[:3-len(reasons)]])
+                classification_data['gym_classification_reasons'] = reasons[:5]
+                
+                # Confidence adjustment
+                if total_red_factors >= 1:
+                    classification_data['gym_classification_confidence'] = 'high'
+                else:
+                    classification_data['gym_classification_confidence'] = 'medium'
+                    
+            else:
+                classification_data['gym_classification'] = 'green'
+                classification_data['gym_action_priority'] = 'low'
+                classification_data['gym_sales_readiness'] = 'not_ready'
+                classification_data['gym_classification_reasons'] = ['Digital infrastructure meets current needs', 'No critical pain points identified']
+                classification_data['gym_classification_confidence'] = 'high'
+            
+            # Add classification summary
+            classification_data['gym_classification_summary'] = self._generate_classification_summary(
+                classification_data['gym_classification'],
+                gym_type,
+                gym_size,
+                red_criteria,
+                yellow_criteria
+            )
+            
+            # Update lead with classification data
+            for key, value in classification_data.items():
+                lead[key] = value
+            
+            # Override general status with gym-specific classification if more severe
+            if classification_data['gym_classification'] == 'red' and lead.get('status') != 'error':
+                lead['status'] = 'red'
+                lead['status_source'] = 'gym_specific_classification'
+            elif classification_data['gym_classification'] == 'yellow' and lead.get('status') == 'green':
+                lead['status'] = 'yellow'
+                lead['status_source'] = 'gym_specific_classification'
+            
+            logger.info(f"Gym classification for {lead['business_name']} ({gym_size} {gym_type}): "
+                       f"{classification_data['gym_classification'].upper()} "
+                       f"(confidence: {classification_data['gym_classification_confidence']}, "
+                       f"priority: {classification_data['gym_action_priority']})")
+            
+            return lead
+            
+        except Exception as e:
+            logger.error(f"Error in gym-specific classification: {e}")
+            lead['gym_classification'] = 'unknown'
+            lead['gym_classification_confidence'] = 'low'
+            lead['gym_classification_reasons'] = ['Classification analysis failed']
+            lead['gym_action_priority'] = 'unknown'
+            lead['gym_sales_readiness'] = 'unknown'
+            return lead
+    
+    def _generate_classification_summary(self, classification: str, gym_type: str, gym_size: str,
+                                       red_criteria: List[Dict], yellow_criteria: List[Dict]) -> str:
+        """Generate a human-readable classification summary"""
+        gym_type_display = gym_type.replace('_', ' ').title()
+        
+        if classification == 'red':
+            severity = "urgent" if len(red_criteria) >= 3 else "high"
+            return (f"This {gym_size} {gym_type_display} has {severity} need for modern gym management solutions. "
+                   f"With {len(red_criteria)} critical issues identified, they are experiencing significant "
+                   f"operational inefficiencies and member experience challenges that directly impact revenue.")
+        
+        elif classification == 'yellow':
+            return (f"This {gym_size} {gym_type_display} shows moderate potential for improvement. "
+                   f"While functioning, they have {len(red_criteria) + len(yellow_criteria)} areas where modern "
+                   f"gym software could enhance operations and member satisfaction.")
+        
+        else:
+            return (f"This {gym_size} {gym_type_display} appears to have adequate digital infrastructure "
+                   f"for their current needs. They may not be immediately interested in new solutions.")
 
     def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
         """Get contextual software recommendations based on what was detected"""
@@ -1923,6 +2164,9 @@ class LeadProcessor:
                 lead['gym_threshold_violations'] = size_model_adjustments.get('threshold_violations', [])
                 lead['gym_size_context'] = size_model_adjustments.get('size_context', '')
                 lead['gym_model_context'] = size_model_adjustments.get('model_context', '')
+                
+                # Apply gym-specific RED/GREEN classification
+                lead = self._apply_gym_specific_red_green_classification(lead)
                 
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
                 if gym_software_analysis['detected_software']:
@@ -2417,6 +2661,12 @@ class LeadProcessor:
                 'gym_years_in_business', 'gym_staff_size_estimate', 'gym_digital_presence_score',
                 'gym_software_needs_score', 'gym_software_detected', 'gym_software_scores',
                 'gym_software_quality_score', 'gym_software_recommendations', 'gym_software_red_flags',
+                # Gym pain and classification fields
+                'gym_pain_score', 'gym_adjusted_pain_score', 'gym_pain_urgency', 'gym_adjusted_urgency',
+                'gym_primary_pain_category', 'gym_total_pain_points', 'gym_critical_pain_issues',
+                'gym_size_pain_multiplier', 'gym_model_pain_multiplier', 'gym_threshold_violations',
+                'gym_classification', 'gym_classification_confidence', 'gym_classification_reasons',
+                'gym_action_priority', 'gym_sales_readiness', 'gym_classification_summary',
                 'screenshot_url', 'logo_url', 'logo_extraction_method', 'logo_fallback_generated', 
                 'logo_quality_score', 'logo_valid', 'pdf_url', 'error_notes'
             ]

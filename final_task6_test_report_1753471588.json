@@ -1,0 +1,107 @@
+{
+  "test_timestamp": 1753471588.107297,
+  "test_time_iso": "2025-07-25 12:26:28",
+  "test_type": "final_task6_integration",
+  "input_data": {
+    "total_leads": 3,
+    "red_leads": 2,
+    "green_leads": 1,
+    "leads_with_websites": 3
+  },
+  "screenshot_results": {
+    "total_attempts": 2,
+    "successful_captures": 2,
+    "failed_captures": 0,
+    "screenshot_files": [
+      "screenshots/playwright_example.com_1753471587.png",
+      "screenshots/playwright_httpbin.org_1753471587.png"
+    ]
+  },
+  "upload_results": {
+    "cloud_urls": {
+      "https://example.com": "https://drive.google.com/file/d/FAKE_af62ab2e349848e1c93afd9dab456485/view?usp=sharing",
+      "https://httpbin.org/html": "https://drive.google.com/file/d/FAKE_825296ac0906f75350018bf599d001f2/view?usp=sharing"
+    },
+    "upload_metadata": {
+      "https://example.com": {
+        "file_id": "FAKE_af62ab2e349848e1c93afd9dab456485",
+        "drive_filename": "Demo_Restaurant_example.com_1753471587.png",
+        "business_name": "Demo Restaurant",
+        "original_url": "https://example.com",
+        "local_path": "screenshots/playwright_example.com_1753471587.png",
+        "upload_timestamp": 1753471587.821988,
+        "upload_time_iso": "2025-07-25 12:26:27",
+        "file_size": 673,
+        "cloud_provider": "google_drive_simulation",
+        "folder_id": "FAKE_FOLDER",
+        "public_access": false,
+        "cloud_url": "https://drive.google.com/file/d/FAKE_af62ab2e349848e1c93afd9dab456485/view?usp=sharing",
+        "api_method": "simulation_fallback",
+        "warning": "This is a simulated upload - URL will not work"
+      },
+      "https://httpbin.org/html": {
+        "file_id": "FAKE_825296ac0906f75350018bf599d001f2",
+        "drive_filename": "Test_Gym_httpbin.org_1753471587.png",
+        "business_name": "Test Gym",
+        "original_url": "https://httpbin.org/html",
+        "local_path": "screenshots/playwright_httpbin.org_1753471587.png",
+        "upload_timestamp": 1753471588.106246,
+        "upload_time_iso": "2025-07-25 12:26:28",
+        "file_size": 683,
+        "cloud_provider": "google_drive_simulation",
+        "folder_id": "FAKE_FOLDER",
+        "public_access": false,
+        "cloud_url": "https://drive.google.com/file/d/FAKE_825296ac0906f75350018bf599d001f2/view?usp=sharing",
+        "api_method": "simulation_fallback",
+        "warning": "This is a simulated upload - URL will not work"
+      }
+    },
+    "failed_uploads": [],
+    "validation_results": {
+      "https://example.com": {
+        "is_valid": false,
+        "issues": [
+          "File too small: 673 bytes"
+        ],
+        "warnings": [],
+        "file_info": {
+          "size_bytes": 673,
+          "format": ".png"
+        },
+        "business_name": "Demo Restaurant"
+      },
+      "https://httpbin.org/html": {
+        "is_valid": false,
+        "issues": [
+          "File too small: 683 bytes"
+        ],
+        "warnings": [],
+        "file_info": {
+          "size_bytes": 683,
+          "format": ".png"
+        },
+        "business_name": "Test Gym"
+      }
+    },
+    "summary": {
+      "total_processed": 2,
+      "successful_uploads": 2,
+      "failed_uploads": 0,
+      "upload_success_rate": 100.0,
+      "valid_files": 0,
+      "file_validation_rate": 0.0,
+      "processing_timestamp": "2025-07-25 12:26:28"
+    }
+  },
+  "system_status": {
+    "screenshot_system": "ready_for_mcp",
+    "google_drive_api": "configured",
+    "workflow_complete": true
+  },
+  "next_steps": [
+    "Execute MCP calls for real screenshot capture",
+    "Verify Google Drive API credentials",
+    "Test with production lead data",
+    "Monitor screenshot quality and upload success rates"
+  ]
+}

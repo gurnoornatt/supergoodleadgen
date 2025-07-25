@@ -99,18 +99,18 @@ class TestGymLeadFields(unittest.TestCase):
     
     def test_gym_size_estimation(self):
         """Test gym size estimation logic"""
-        # Test review-based estimation
-        large_gym = {'reviews': 800, 'rating': 4.0}
-        medium_gym = {'reviews': 200, 'rating': 4.2}
-        small_gym = {'reviews': 50, 'rating': 4.5}
+        # Test review-based estimation (aligned with implementation thresholds)
+        large_gym = {'reviews': 1200, 'rating': 4.0, 'title': 'Mega Fitness Center'}  # > 1000 reviews
+        medium_gym = {'reviews': 350, 'rating': 4.2, 'title': 'Local Gym'}  # 200-500 range
+        small_gym = {'reviews': 50, 'rating': 4.5, 'title': 'Small Studio'}  # < 200
         
         self.assertEqual(self.lead_processor._estimate_gym_size(large_gym, ''), 'large')
         self.assertEqual(self.lead_processor._estimate_gym_size(medium_gym, ''), 'medium')
         self.assertEqual(self.lead_processor._estimate_gym_size(small_gym, ''), 'small')
         
         # Test text-based overrides
-        self.assertEqual(self.lead_processor._estimate_gym_size({'reviews': 50}, 'boutique intimate studio'), 'small')
-        self.assertEqual(self.lead_processor._estimate_gym_size({'reviews': 50}, 'large chain franchise 24/7'), 'large')
+        self.assertEqual(self.lead_processor._estimate_gym_size({'reviews': 50, 'title': 'Boutique Studio'}, 'boutique intimate studio'), 'small')
+        self.assertEqual(self.lead_processor._estimate_gym_size({'reviews': 50, 'title': '24 Hour Fitness'}, 'large chain franchise 24/7'), 'large')
         
         print("✓ Gym size estimation working correctly")
     

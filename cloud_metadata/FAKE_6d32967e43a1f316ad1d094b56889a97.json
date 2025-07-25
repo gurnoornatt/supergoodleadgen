@@ -1,0 +1,16 @@
+{
+  "file_id": "FAKE_6d32967e43a1f316ad1d094b56889a97",
+  "drive_filename": "Demo_Restaurant_example.com_1753471516.png",
+  "business_name": "Demo Restaurant",
+  "original_url": "https://example.com",
+  "local_path": "screenshots/playwright_example.com_1753471516.png",
+  "upload_timestamp": 1753471517.422984,
+  "upload_time_iso": "2025-07-25 12:25:17",
+  "file_size": 673,
+  "cloud_provider": "google_drive_simulation",
+  "folder_id": "FAKE_FOLDER",
+  "public_access": false,
+  "cloud_url": "https://drive.google.com/file/d/FAKE_6d32967e43a1f316ad1d094b56889a97/view?usp=sharing",
+  "api_method": "simulation_fallback",
+  "warning": "This is a simulated upload - URL will not work"
+}

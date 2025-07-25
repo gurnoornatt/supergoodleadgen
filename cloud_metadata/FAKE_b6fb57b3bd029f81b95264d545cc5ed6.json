@@ -1,0 +1,16 @@
+{
+  "file_id": "FAKE_b6fb57b3bd029f81b95264d545cc5ed6",
+  "drive_filename": "Test_Gym_httpbin.org_1753471517.png",
+  "business_name": "Test Gym",
+  "original_url": "https://httpbin.org/html",
+  "local_path": "screenshots/playwright_httpbin.org_1753471516.png",
+  "upload_timestamp": 1753471517.694446,
+  "upload_time_iso": "2025-07-25 12:25:17",
+  "file_size": 683,
+  "cloud_provider": "google_drive_simulation",
+  "folder_id": "FAKE_FOLDER",
+  "public_access": false,
+  "cloud_url": "https://drive.google.com/file/d/FAKE_b6fb57b3bd029f81b95264d545cc5ed6/view?usp=sharing",
+  "api_method": "simulation_fallback",
+  "warning": "This is a simulated upload - URL will not work"
+}
