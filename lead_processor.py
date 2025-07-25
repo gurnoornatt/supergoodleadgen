@@ -2214,6 +2214,178 @@ class LeadProcessor:
                 'size_tier': 'unknown',
                 'revenue_tier': 'unknown'
             }
+    
+    def _identify_decision_makers(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Identify and qualify decision makers at gym businesses"""
+        try:
+            decision_maker_data = {
+                'likely_decision_makers': [],
+                'decision_making_structure': 'unknown',
+                'contact_quality': 'unknown',
+                'owner_identified': False,
+                'management_level': 'unknown',
+                'franchise_considerations': {},
+                'decision_factors': []
+            }
+            
+            # Get gym data
+            gym_type = lead.get('gym_type', 'unknown')
+            gym_size = lead.get('gym_size_estimate', 'unknown')
+            franchise_chain = lead.get('gym_franchise_chain', '')
+            business_name = lead.get('business_name', '')
+            reviews_data = lead.get('reviews_data', [])
+            website_url = lead.get('website', '')
+            
+            # Analyze business structure based on size and type
+            if gym_size == 'large' or franchise_chain:
+                decision_maker_data['decision_making_structure'] = 'corporate'
+                decision_maker_data['management_level'] = 'multi_tier'
+                decision_maker_data['likely_decision_makers'] = [
+                    {'title': 'General Manager', 'influence': 'high', 'focus': 'operations'},
+                    {'title': 'Operations Director', 'influence': 'high', 'focus': 'efficiency'},
+                    {'title': 'Regional Manager', 'influence': 'medium', 'focus': 'standardization'}
+                ]
+                
+                if franchise_chain:
+                    decision_maker_data['franchise_considerations'] = {
+                        'is_franchise': True,
+                        'decision_level': 'may require corporate approval',
+                        'key_contact': 'Franchise owner or area developer',
+                        'approval_complexity': 'high'
+                    }
+                    decision_maker_data['likely_decision_makers'].append(
+                        {'title': 'Franchise Owner', 'influence': 'very_high', 'focus': 'roi'}
+                    )
+                
+            elif gym_size == 'medium':
+                decision_maker_data['decision_making_structure'] = 'owner_operated'
+                decision_maker_data['management_level'] = 'single_tier'
+                decision_maker_data['likely_decision_makers'] = [
+                    {'title': 'Owner/Operator', 'influence': 'very_high', 'focus': 'growth'},
+                    {'title': 'General Manager', 'influence': 'high', 'focus': 'daily_operations'}
+                ]
+                
+            elif gym_size == 'small' or gym_type in ['personal_training', 'boutique_fitness', 'yoga_studio']:
+                decision_maker_data['decision_making_structure'] = 'owner_direct'
+                decision_maker_data['management_level'] = 'owner_only'
+                decision_maker_data['likely_decision_makers'] = [
+                    {'title': 'Owner', 'influence': 'exclusive', 'focus': 'all_aspects'}
+                ]
+                decision_maker_data['owner_identified'] = True
+                
+            # Scan reviews for owner/manager mentions
+            owner_mentions = 0
+            manager_mentions = 0
+            staff_quality_mentions = 0
+            
+            for review in reviews_data[:50]:  # Check first 50 reviews
+                review_text = review.get('text', '').lower()
+                if any(term in review_text for term in ['owner', 'owns', 'founded']):
+                    owner_mentions += 1
+                if any(term in review_text for term in ['manager', 'management', 'gm']):
+                    manager_mentions += 1
+                if any(term in review_text for term in ['staff', 'trainer', 'instructor', 'coach']):
+                    staff_quality_mentions += 1
+            
+            # Adjust based on review insights
+            if owner_mentions >= 3:
+                decision_maker_data['owner_identified'] = True
+                decision_maker_data['decision_factors'].append('Owner actively involved (mentioned in reviews)')
+            
+            if manager_mentions >= 5:
+                decision_maker_data['decision_factors'].append('Professional management structure evident')
+            
+            # Determine contact quality based on available info
+            contact_score = 0
+            
+            if website_url:
+                contact_score += 30
+                decision_maker_data['decision_factors'].append('Website available for research')
+            
+            if lead.get('phone'):
+                contact_score += 20
+                decision_maker_data['decision_factors'].append('Direct phone contact available')
+            
+            if decision_maker_data['owner_identified']:
+                contact_score += 25
+                decision_maker_data['decision_factors'].append('Owner involvement confirmed')
+            
+            if gym_size in ['small', 'medium']:
+                contact_score += 15
+                decision_maker_data['decision_factors'].append('Smaller size = easier access to decision makers')
+            
+            if lead.get('gym_linkedin_presence', False):
+                contact_score += 10
+                decision_maker_data['decision_factors'].append('LinkedIn presence for professional outreach')
+            
+            # Determine contact quality
+            if contact_score >= 70:
+                decision_maker_data['contact_quality'] = 'excellent'
+            elif contact_score >= 50:
+                decision_maker_data['contact_quality'] = 'good'
+            elif contact_score >= 30:
+                decision_maker_data['contact_quality'] = 'fair'
+            else:
+                decision_maker_data['contact_quality'] = 'poor'
+            
+            # Add sales approach recommendations based on decision structure
+            if decision_maker_data['decision_making_structure'] == 'corporate':
+                decision_maker_data['sales_approach'] = {
+                    'strategy': 'enterprise',
+                    'key_points': [
+                        'Focus on scalability and standardization',
+                        'Emphasize ROI and efficiency metrics',
+                        'Prepare for longer sales cycle',
+                        'Consider pilot program approach'
+                    ],
+                    'estimated_sales_cycle': '3-6 months'
+                }
+            elif decision_maker_data['decision_making_structure'] == 'owner_operated':
+                decision_maker_data['sales_approach'] = {
+                    'strategy': 'relationship',
+                    'key_points': [
+                        'Build trust with owner/operator',
+                        'Focus on growth and member satisfaction',
+                        'Demonstrate quick wins',
+                        'Offer flexible terms'
+                    ],
+                    'estimated_sales_cycle': '1-3 months'
+                }
+            else:  # owner_direct
+                decision_maker_data['sales_approach'] = {
+                    'strategy': 'consultative',
+                    'key_points': [
+                        'Direct owner engagement',
+                        'Focus on time savings and simplicity',
+                        'Emphasize personal support',
+                        'Start with basic package'
+                    ],
+                    'estimated_sales_cycle': '2-4 weeks'
+                }
+            
+            # Assess overall decision maker accessibility
+            if decision_maker_data['contact_quality'] in ['excellent', 'good'] and \
+               decision_maker_data['management_level'] in ['owner_only', 'single_tier']:
+                decision_maker_data['accessibility_rating'] = 'high'
+            elif decision_maker_data['contact_quality'] == 'poor' or \
+                 decision_maker_data['management_level'] == 'multi_tier':
+                decision_maker_data['accessibility_rating'] = 'low'
+            else:
+                decision_maker_data['accessibility_rating'] = 'medium'
+            
+            return decision_maker_data
+            
+        except Exception as e:
+            logger.error(f"Error in decision maker identification: {e}")
+            return {
+                'likely_decision_makers': [],
+                'decision_making_structure': 'unknown',
+                'contact_quality': 'unknown',
+                'owner_identified': False,
+                'management_level': 'unknown',
+                'franchise_considerations': {},
+                'decision_factors': ['Error in analysis']
+            }
 
     def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
         """Get contextual software recommendations based on what was detected"""
@@ -2392,6 +2564,18 @@ class LeadProcessor:
                 lead['gym_revenue_tier'] = revenue_qualification['revenue_tier']
                 lead['gym_estimated_monthly_software_budget'] = revenue_qualification.get('estimated_monthly_software_budget', 0)
                 
+                # Identify decision makers
+                decision_maker_analysis = self._identify_decision_makers(lead)
+                lead['gym_decision_makers'] = decision_maker_analysis['likely_decision_makers']
+                lead['gym_decision_structure'] = decision_maker_analysis['decision_making_structure']
+                lead['gym_contact_quality'] = decision_maker_analysis['contact_quality']
+                lead['gym_owner_identified'] = decision_maker_analysis['owner_identified']
+                lead['gym_management_level'] = decision_maker_analysis['management_level']
+                lead['gym_franchise_considerations'] = decision_maker_analysis.get('franchise_considerations', {})
+                lead['gym_decision_factors'] = decision_maker_analysis['decision_factors']
+                lead['gym_sales_approach'] = decision_maker_analysis.get('sales_approach', {})
+                lead['gym_decision_accessibility'] = decision_maker_analysis.get('accessibility_rating', 'unknown')
+                
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
                 if gym_software_analysis['detected_software']:
                     logger.info(f"Gym software detected: {', '.join(gym_software_analysis['detected_software'])}")
@@ -2400,6 +2584,9 @@ class LeadProcessor:
                            f"(viability score: {revenue_qualification['viability_score']}, "
                            f"estimated revenue: ${revenue_qualification['estimated_monthly_revenue']:,}/month, "
                            f"members: ~{revenue_qualification['estimated_member_count']})")
+                logger.info(f"Decision maker analysis for {lead['business_name']}: {decision_maker_analysis['decision_making_structure']} structure, "
+                           f"contact quality: {decision_maker_analysis['contact_quality']}, "
+                           f"accessibility: {decision_maker_analysis.get('accessibility_rating', 'unknown')}")
                 logger.info(f"Mobile app analysis for {lead['business_name']}: {'Available' if mobile_app_analysis['has_mobile_app'] else 'Not available'} (quality: {mobile_app_analysis['app_quality_score']})")
                 logger.info(f"Digital infrastructure score for {lead['business_name']}: {digital_infrastructure_analysis['overall_score']}/100 ({digital_infrastructure_analysis['tier']}) - Readiness: {digital_infrastructure_analysis['digital_readiness']}/100")
                 logger.info(f"Gym pain analysis for {lead['business_name']}: pain_score={gym_pain_analysis['pain_score']}, urgency={gym_pain_analysis['urgency_level']}, primary_category={gym_pain_analysis['primary_pain_category']}")
@@ -2900,6 +3087,9 @@ class LeadProcessor:
                 'gym_estimated_member_count', 'gym_viability_score', 'gym_qualification_reasons',
                 'gym_disqualification_reasons', 'gym_size_tier', 'gym_revenue_tier',
                 'gym_estimated_monthly_software_budget',
+                # Decision maker fields
+                'gym_decision_structure', 'gym_contact_quality', 'gym_owner_identified',
+                'gym_management_level', 'gym_decision_accessibility', 'gym_decision_factors',
                 'screenshot_url', 'logo_url', 'logo_extraction_method', 'logo_fallback_generated', 
                 'logo_quality_score', 'logo_valid', 'pdf_url', 'error_notes'
             ]
