@@ -2003,6 +2003,217 @@ class LeadProcessor:
         else:
             return (f"This {gym_size} {gym_type_display} appears to have adequate digital infrastructure "
                    f"for their current needs. They may not be immediately interested in new solutions.")
+    
+    def _qualify_gym_size_and_revenue(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Qualify leads based on gym size and revenue potential for sales viability"""
+        try:
+            qualification_data = {
+                'size_qualification': 'unqualified',
+                'revenue_potential': 'low',
+                'estimated_monthly_revenue': 0,
+                'estimated_member_count': 0,
+                'viability_score': 0,  # 0-100
+                'qualification_reasons': [],
+                'disqualification_reasons': [],
+                'size_tier': 'unknown',
+                'revenue_tier': 'unknown'
+            }
+            
+            # Get gym size and type
+            gym_size = lead.get('gym_size_estimate', 'unknown')
+            gym_type = lead.get('gym_type', 'unknown')
+            gym_services = lead.get('gym_services', [])
+            pricing_indicators = lead.get('gym_pricing_indicators', [])
+            reviews_count = lead.get('reviews_count', 0)
+            rating = lead.get('rating', 0)
+            
+            # Estimate member count based on gym size
+            member_count_ranges = {
+                'large': {'min': 1000, 'max': 5000, 'typical': 2500},
+                'medium': {'min': 300, 'max': 1000, 'typical': 600},
+                'small': {'min': 50, 'max': 300, 'typical': 150},
+                'unknown': {'min': 100, 'max': 500, 'typical': 250}
+            }
+            
+            size_data = member_count_ranges.get(gym_size, member_count_ranges['unknown'])
+            
+            # Adjust member count based on gym type
+            type_multipliers = {
+                'crossfit': 0.4,  # Smaller member base but higher revenue per member
+                'boutique_fitness': 0.5,
+                'yoga_studio': 0.6,
+                'martial_arts': 0.7,
+                'personal_training': 0.2,  # Very small member base
+                'traditional_gym': 1.0,
+                'fitness_center': 1.0,
+                'health_club': 1.2
+            }
+            
+            type_multiplier = type_multipliers.get(gym_type, 1.0)
+            estimated_members = int(size_data['typical'] * type_multiplier)
+            
+            # Adjust based on review count as a proxy for popularity
+            if reviews_count > 500:
+                estimated_members = int(estimated_members * 1.3)
+            elif reviews_count > 200:
+                estimated_members = int(estimated_members * 1.1)
+            elif reviews_count < 50:
+                estimated_members = int(estimated_members * 0.7)
+            
+            qualification_data['estimated_member_count'] = estimated_members
+            
+            # Estimate monthly revenue per member based on gym type and pricing indicators
+            revenue_per_member = {
+                'crossfit': {'low': 100, 'mid': 150, 'high': 200},
+                'boutique_fitness': {'low': 80, 'mid': 120, 'high': 180},
+                'personal_training': {'low': 200, 'mid': 400, 'high': 600},
+                'yoga_studio': {'low': 60, 'mid': 90, 'high': 130},
+                'martial_arts': {'low': 70, 'mid': 100, 'high': 150},
+                'traditional_gym': {'low': 20, 'mid': 40, 'high': 60},
+                'fitness_center': {'low': 25, 'mid': 45, 'high': 70},
+                'health_club': {'low': 50, 'mid': 80, 'high': 120}
+            }
+            
+            # Determine pricing tier
+            if 'premium' in pricing_indicators or 'high_price' in pricing_indicators:
+                pricing_tier = 'high'
+            elif 'budget_friendly' in pricing_indicators:
+                pricing_tier = 'low'
+            else:
+                pricing_tier = 'mid'
+            
+            # Get revenue per member
+            type_revenue = revenue_per_member.get(gym_type, revenue_per_member['traditional_gym'])
+            monthly_per_member = type_revenue[pricing_tier]
+            
+            # Calculate estimated monthly revenue
+            estimated_monthly_revenue = estimated_members * monthly_per_member
+            qualification_data['estimated_monthly_revenue'] = estimated_monthly_revenue
+            
+            # Determine revenue tier
+            if estimated_monthly_revenue >= 100000:
+                qualification_data['revenue_tier'] = 'enterprise'
+                qualification_data['revenue_potential'] = 'very_high'
+            elif estimated_monthly_revenue >= 50000:
+                qualification_data['revenue_tier'] = 'large'
+                qualification_data['revenue_potential'] = 'high'
+            elif estimated_monthly_revenue >= 20000:
+                qualification_data['revenue_tier'] = 'medium'
+                qualification_data['revenue_potential'] = 'medium'
+            elif estimated_monthly_revenue >= 10000:
+                qualification_data['revenue_tier'] = 'small'
+                qualification_data['revenue_potential'] = 'low'
+            else:
+                qualification_data['revenue_tier'] = 'micro'
+                qualification_data['revenue_potential'] = 'very_low'
+            
+            # Determine size tier based on member count
+            if estimated_members >= 1000:
+                qualification_data['size_tier'] = 'large'
+            elif estimated_members >= 300:
+                qualification_data['size_tier'] = 'medium'
+            elif estimated_members >= 100:
+                qualification_data['size_tier'] = 'small'
+            else:
+                qualification_data['size_tier'] = 'micro'
+            
+            # Calculate viability score (0-100)
+            viability_score = 0
+            
+            # Revenue component (40 points)
+            if qualification_data['revenue_potential'] == 'very_high':
+                viability_score += 40
+                qualification_data['qualification_reasons'].append('Very high revenue potential ($100K+/month)')
+            elif qualification_data['revenue_potential'] == 'high':
+                viability_score += 30
+                qualification_data['qualification_reasons'].append('High revenue potential ($50K-100K/month)')
+            elif qualification_data['revenue_potential'] == 'medium':
+                viability_score += 20
+                qualification_data['qualification_reasons'].append('Medium revenue potential ($20K-50K/month)')
+            elif qualification_data['revenue_potential'] == 'low':
+                viability_score += 10
+                qualification_data['qualification_reasons'].append('Low revenue potential ($10K-20K/month)')
+            else:
+                qualification_data['disqualification_reasons'].append('Very low revenue potential (<$10K/month)')
+            
+            # Size component (30 points)
+            if estimated_members >= 500:
+                viability_score += 30
+                qualification_data['qualification_reasons'].append(f'Good member base size (~{estimated_members} members)')
+            elif estimated_members >= 200:
+                viability_score += 20
+                qualification_data['qualification_reasons'].append(f'Moderate member base (~{estimated_members} members)')
+            elif estimated_members >= 100:
+                viability_score += 10
+                qualification_data['qualification_reasons'].append(f'Small but viable member base (~{estimated_members} members)')
+            else:
+                qualification_data['disqualification_reasons'].append(f'Very small member base (<100 members)')
+            
+            # Business quality component (20 points)
+            if rating >= 4.5 and reviews_count >= 100:
+                viability_score += 20
+                qualification_data['qualification_reasons'].append('Excellent reputation (4.5+ rating, 100+ reviews)')
+            elif rating >= 4.0 and reviews_count >= 50:
+                viability_score += 15
+                qualification_data['qualification_reasons'].append('Good reputation')
+            elif rating >= 3.5:
+                viability_score += 10
+            else:
+                qualification_data['disqualification_reasons'].append('Poor reputation (rating < 3.5)')
+            
+            # Growth potential component (10 points)
+            if gym_type in ['crossfit', 'boutique_fitness', 'fitness_center']:
+                viability_score += 10
+                qualification_data['qualification_reasons'].append(f'High-growth gym type ({gym_type})')
+            elif gym_type in ['traditional_gym', 'yoga_studio']:
+                viability_score += 5
+            
+            qualification_data['viability_score'] = viability_score
+            
+            # Determine qualification status
+            if viability_score >= 70:
+                qualification_data['size_qualification'] = 'highly_qualified'
+            elif viability_score >= 50:
+                qualification_data['size_qualification'] = 'qualified'
+            elif viability_score >= 30:
+                qualification_data['size_qualification'] = 'marginally_qualified'
+            else:
+                qualification_data['size_qualification'] = 'unqualified'
+            
+            # Add context about software spend potential
+            software_spend_percentage = 0.02  # 2% of revenue for software
+            if gym_type in ['crossfit', 'boutique_fitness']:
+                software_spend_percentage = 0.03  # Higher tech adoption
+            elif gym_type == 'personal_training':
+                software_spend_percentage = 0.015  # Lower needs
+            
+            estimated_software_budget = int(estimated_monthly_revenue * software_spend_percentage)
+            qualification_data['estimated_monthly_software_budget'] = estimated_software_budget
+            
+            if estimated_software_budget >= 2000:
+                qualification_data['qualification_reasons'].append(f'Strong software budget potential (~${estimated_software_budget}/month)')
+            elif estimated_software_budget >= 1000:
+                qualification_data['qualification_reasons'].append(f'Moderate software budget (~${estimated_software_budget}/month)')
+            elif estimated_software_budget >= 500:
+                qualification_data['qualification_reasons'].append(f'Basic software budget (~${estimated_software_budget}/month)')
+            else:
+                qualification_data['disqualification_reasons'].append(f'Limited software budget (<$500/month)')
+            
+            return qualification_data
+            
+        except Exception as e:
+            logger.error(f"Error in gym size and revenue qualification: {e}")
+            return {
+                'size_qualification': 'unknown',
+                'revenue_potential': 'unknown',
+                'estimated_monthly_revenue': 0,
+                'estimated_member_count': 0,
+                'viability_score': 0,
+                'qualification_reasons': [],
+                'disqualification_reasons': ['Error in qualification analysis'],
+                'size_tier': 'unknown',
+                'revenue_tier': 'unknown'
+            }
 
     def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
         """Get contextual software recommendations based on what was detected"""
@@ -2168,10 +2379,27 @@ class LeadProcessor:
                 # Apply gym-specific RED/GREEN classification
                 lead = self._apply_gym_specific_red_green_classification(lead)
                 
+                # Apply gym size and revenue qualification
+                revenue_qualification = self._qualify_gym_size_and_revenue(lead)
+                lead['gym_size_qualification'] = revenue_qualification['size_qualification']
+                lead['gym_revenue_potential'] = revenue_qualification['revenue_potential']
+                lead['gym_estimated_monthly_revenue'] = revenue_qualification['estimated_monthly_revenue']
+                lead['gym_estimated_member_count'] = revenue_qualification['estimated_member_count']
+                lead['gym_viability_score'] = revenue_qualification['viability_score']
+                lead['gym_qualification_reasons'] = revenue_qualification['qualification_reasons']
+                lead['gym_disqualification_reasons'] = revenue_qualification['disqualification_reasons']
+                lead['gym_size_tier'] = revenue_qualification['size_tier']
+                lead['gym_revenue_tier'] = revenue_qualification['revenue_tier']
+                lead['gym_estimated_monthly_software_budget'] = revenue_qualification.get('estimated_monthly_software_budget', 0)
+                
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
                 if gym_software_analysis['detected_software']:
                     logger.info(f"Gym software detected: {', '.join(gym_software_analysis['detected_software'])}")
                 logger.info(f"Website features detected for {lead['business_name']}: {website_feature_analysis['implemented_count']}/{website_feature_analysis['total_features']} features (score: {website_feature_analysis['feature_score']})")
+                logger.info(f"Gym revenue qualification for {lead['business_name']}: {revenue_qualification['size_qualification']} "
+                           f"(viability score: {revenue_qualification['viability_score']}, "
+                           f"estimated revenue: ${revenue_qualification['estimated_monthly_revenue']:,}/month, "
+                           f"members: ~{revenue_qualification['estimated_member_count']})")
                 logger.info(f"Mobile app analysis for {lead['business_name']}: {'Available' if mobile_app_analysis['has_mobile_app'] else 'Not available'} (quality: {mobile_app_analysis['app_quality_score']})")
                 logger.info(f"Digital infrastructure score for {lead['business_name']}: {digital_infrastructure_analysis['overall_score']}/100 ({digital_infrastructure_analysis['tier']}) - Readiness: {digital_infrastructure_analysis['digital_readiness']}/100")
                 logger.info(f"Gym pain analysis for {lead['business_name']}: pain_score={gym_pain_analysis['pain_score']}, urgency={gym_pain_analysis['urgency_level']}, primary_category={gym_pain_analysis['primary_pain_category']}")
@@ -2667,6 +2895,11 @@ class LeadProcessor:
                 'gym_size_pain_multiplier', 'gym_model_pain_multiplier', 'gym_threshold_violations',
                 'gym_classification', 'gym_classification_confidence', 'gym_classification_reasons',
                 'gym_action_priority', 'gym_sales_readiness', 'gym_classification_summary',
+                # Revenue qualification fields
+                'gym_size_qualification', 'gym_revenue_potential', 'gym_estimated_monthly_revenue',
+                'gym_estimated_member_count', 'gym_viability_score', 'gym_qualification_reasons',
+                'gym_disqualification_reasons', 'gym_size_tier', 'gym_revenue_tier',
+                'gym_estimated_monthly_software_budget',
                 'screenshot_url', 'logo_url', 'logo_extraction_method', 'logo_fallback_generated', 
                 'logo_quality_score', 'logo_valid', 'pdf_url', 'error_notes'
             ]
