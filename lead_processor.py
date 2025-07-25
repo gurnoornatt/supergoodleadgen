@@ -2386,6 +2386,188 @@ class LeadProcessor:
                 'franchise_considerations': {},
                 'decision_factors': ['Error in analysis']
             }
+    
+    def _estimate_gym_software_budget(self, lead: Dict[str, Any]) -> Dict[str, Any]:
+        """Develop comprehensive budget estimation for gym software"""
+        try:
+            budget_data = {
+                'estimated_total_budget': 0,
+                'budget_breakdown': {},
+                'budget_confidence': 'low',
+                'budget_factors': [],
+                'recommended_package': 'unknown',
+                'pricing_tier': 'unknown',
+                'contract_recommendations': {},
+                'competitor_spend_estimate': 0
+            }
+            
+            # Get key data
+            monthly_revenue = lead.get('gym_estimated_monthly_revenue', 0)
+            member_count = lead.get('gym_estimated_member_count', 0)
+            gym_type = lead.get('gym_type', 'unknown')
+            gym_size = lead.get('gym_size_estimate', 'unknown')
+            current_software = lead.get('gym_software_detected', [])
+            digital_score = lead.get('gym_digital_infrastructure_score', 0)
+            classification = lead.get('gym_classification', 'unknown')
+            
+            # Base software spend percentage by gym type
+            base_spend_percentages = {
+                'crossfit': 0.035,  # 3.5% - High tech adoption
+                'boutique_fitness': 0.03,  # 3% - Premium focus
+                'fitness_center': 0.025,  # 2.5% - Balanced
+                'health_club': 0.025,  # 2.5% - Established systems
+                'traditional_gym': 0.02,  # 2% - Cost conscious
+                'yoga_studio': 0.022,  # 2.2% - Moderate tech
+                'martial_arts': 0.018,  # 1.8% - Traditional
+                'personal_training': 0.015  # 1.5% - Minimal needs
+            }
+            
+            base_percentage = base_spend_percentages.get(gym_type, 0.02)
+            
+            # Adjust based on digital maturity
+            if digital_score >= 80:
+                base_percentage *= 1.3  # High digital maturity = higher spend
+                budget_data['budget_factors'].append('High digital maturity (+30% budget)')
+            elif digital_score >= 60:
+                base_percentage *= 1.1
+                budget_data['budget_factors'].append('Good digital presence (+10% budget)')
+            elif digital_score < 40:
+                base_percentage *= 0.8
+                budget_data['budget_factors'].append('Low digital maturity (-20% budget)')
+            
+            # Adjust based on current software situation
+            if not current_software or all('basic' in s.lower() or 'generic' in s.lower() for s in current_software):
+                base_percentage *= 1.2  # No/basic software = higher initial investment
+                budget_data['budget_factors'].append('Limited current software (+20% budget for initial setup)')
+            elif len(current_software) >= 3:
+                base_percentage *= 0.9  # Multiple systems = consolidation opportunity
+                budget_data['budget_factors'].append('Multiple systems in place (-10% for consolidation)')
+            
+            # Calculate base budget
+            estimated_monthly_budget = int(monthly_revenue * base_percentage)
+            budget_data['estimated_total_budget'] = estimated_monthly_budget
+            
+            # Create detailed budget breakdown
+            if gym_type in ['crossfit', 'boutique_fitness', 'fitness_center']:
+                budget_data['budget_breakdown'] = {
+                    'core_platform': int(estimated_monthly_budget * 0.6),
+                    'mobile_app': int(estimated_monthly_budget * 0.2),
+                    'integrations': int(estimated_monthly_budget * 0.1),
+                    'support_training': int(estimated_monthly_budget * 0.1)
+                }
+            else:
+                budget_data['budget_breakdown'] = {
+                    'core_platform': int(estimated_monthly_budget * 0.7),
+                    'mobile_app': int(estimated_monthly_budget * 0.15),
+                    'integrations': int(estimated_monthly_budget * 0.1),
+                    'support_training': int(estimated_monthly_budget * 0.05)
+                }
+            
+            # Determine pricing tier and package recommendations
+            if member_count >= 1000:
+                budget_data['pricing_tier'] = 'enterprise'
+                budget_data['recommended_package'] = 'enterprise_unlimited'
+                per_member_cost = estimated_monthly_budget / member_count
+                budget_data['budget_factors'].append(f'Enterprise tier: ${per_member_cost:.2f}/member/month')
+            elif member_count >= 500:
+                budget_data['pricing_tier'] = 'professional'
+                budget_data['recommended_package'] = 'professional_plus'
+                per_member_cost = estimated_monthly_budget / member_count
+                budget_data['budget_factors'].append(f'Professional tier: ${per_member_cost:.2f}/member/month')
+            elif member_count >= 200:
+                budget_data['pricing_tier'] = 'standard'
+                budget_data['recommended_package'] = 'standard'
+                per_member_cost = estimated_monthly_budget / member_count
+                budget_data['budget_factors'].append(f'Standard tier: ${per_member_cost:.2f}/member/month')
+            else:
+                budget_data['pricing_tier'] = 'basic'
+                budget_data['recommended_package'] = 'starter'
+                if member_count > 0:
+                    per_member_cost = estimated_monthly_budget / member_count
+                    budget_data['budget_factors'].append(f'Starter tier: ${per_member_cost:.2f}/member/month')
+            
+            # Contract recommendations based on gym characteristics
+            if gym_size == 'large' or lead.get('gym_franchise_chain'):
+                budget_data['contract_recommendations'] = {
+                    'term': 'annual',
+                    'payment': 'monthly',
+                    'discount_potential': '15-20%',
+                    'negotiation_leverage': 'high',
+                    'key_terms': ['Volume pricing', 'Multi-location discount', 'SLA guarantees']
+                }
+            elif classification == 'red' and gym_size == 'medium':
+                budget_data['contract_recommendations'] = {
+                    'term': 'annual',
+                    'payment': 'monthly',
+                    'discount_potential': '10-15%',
+                    'negotiation_leverage': 'medium',
+                    'key_terms': ['Performance guarantees', 'Migration support', 'Training included']
+                }
+            else:
+                budget_data['contract_recommendations'] = {
+                    'term': 'month-to-month',
+                    'payment': 'monthly',
+                    'discount_potential': '5-10%',
+                    'negotiation_leverage': 'low',
+                    'key_terms': ['Flexible terms', 'Easy cancellation', 'Basic support']
+                }
+            
+            # Estimate competitor spend (for sales intelligence)
+            if gym_type in ['crossfit', 'boutique_fitness']:
+                competitor_multiplier = 1.1  # These gyms typically spend more
+            elif gym_type in ['traditional_gym', 'martial_arts']:
+                competitor_multiplier = 0.9  # These typically spend less
+            else:
+                competitor_multiplier = 1.0
+            
+            budget_data['competitor_spend_estimate'] = int(estimated_monthly_budget * competitor_multiplier)
+            
+            # Determine budget confidence
+            confidence_score = 0
+            if monthly_revenue > 0:
+                confidence_score += 40
+            if member_count > 0:
+                confidence_score += 30
+            if current_software:
+                confidence_score += 20
+            if digital_score > 0:
+                confidence_score += 10
+            
+            if confidence_score >= 80:
+                budget_data['budget_confidence'] = 'high'
+            elif confidence_score >= 60:
+                budget_data['budget_confidence'] = 'medium'
+            else:
+                budget_data['budget_confidence'] = 'low'
+            
+            # Add ROI projections
+            if estimated_monthly_budget > 0:
+                # Estimate potential savings/gains
+                efficiency_savings = int(estimated_monthly_budget * 2.5)  # 2.5x ROI typical
+                budget_data['roi_projections'] = {
+                    'monthly_efficiency_savings': efficiency_savings,
+                    'member_retention_value': int(member_count * 0.02 * (monthly_revenue / max(1, member_count))),  # 2% better retention
+                    'new_member_acquisition': int(member_count * 0.05 * (monthly_revenue / max(1, member_count))),  # 5% growth
+                    'payback_period_months': max(3, int(estimated_monthly_budget * 3 / efficiency_savings))
+                }
+                
+                total_monthly_value = sum(budget_data['roi_projections'].values()) - budget_data['roi_projections']['payback_period_months']
+                budget_data['budget_factors'].append(f'Projected ROI: ${total_monthly_value:,}/month after {budget_data["roi_projections"]["payback_period_months"]} months')
+            
+            return budget_data
+            
+        except Exception as e:
+            logger.error(f"Error in gym software budget estimation: {e}")
+            return {
+                'estimated_total_budget': 0,
+                'budget_breakdown': {},
+                'budget_confidence': 'low',
+                'budget_factors': ['Error in budget analysis'],
+                'recommended_package': 'unknown',
+                'pricing_tier': 'unknown',
+                'contract_recommendations': {},
+                'competitor_spend_estimate': 0
+            }
 
     def _get_contextual_software_recommendations(self, detected_software: List[str]) -> List[str]:
         """Get contextual software recommendations based on what was detected"""
@@ -2576,6 +2758,18 @@ class LeadProcessor:
                 lead['gym_sales_approach'] = decision_maker_analysis.get('sales_approach', {})
                 lead['gym_decision_accessibility'] = decision_maker_analysis.get('accessibility_rating', 'unknown')
                 
+                # Estimate software budget
+                budget_estimation = self._estimate_gym_software_budget(lead)
+                lead['gym_software_budget_total'] = budget_estimation['estimated_total_budget']
+                lead['gym_software_budget_breakdown'] = budget_estimation['budget_breakdown']
+                lead['gym_budget_confidence'] = budget_estimation['budget_confidence']
+                lead['gym_budget_factors'] = budget_estimation['budget_factors']
+                lead['gym_recommended_package'] = budget_estimation['recommended_package']
+                lead['gym_pricing_tier'] = budget_estimation['pricing_tier']
+                lead['gym_contract_recommendations'] = budget_estimation['contract_recommendations']
+                lead['gym_competitor_spend'] = budget_estimation['competitor_spend_estimate']
+                lead['gym_roi_projections'] = budget_estimation.get('roi_projections', {})
+                
                 logger.info(f"Technology analysis completed for {lead['business_name']}: {len(technologies)} techs, age score: {tech_analysis['age_score']}")
                 if gym_software_analysis['detected_software']:
                     logger.info(f"Gym software detected: {', '.join(gym_software_analysis['detected_software'])}")
@@ -2587,6 +2781,8 @@ class LeadProcessor:
                 logger.info(f"Decision maker analysis for {lead['business_name']}: {decision_maker_analysis['decision_making_structure']} structure, "
                            f"contact quality: {decision_maker_analysis['contact_quality']}, "
                            f"accessibility: {decision_maker_analysis.get('accessibility_rating', 'unknown')}")
+                logger.info(f"Software budget estimation for {lead['business_name']}: ${budget_estimation['estimated_total_budget']:,}/month "
+                           f"({budget_estimation['pricing_tier']} tier, confidence: {budget_estimation['budget_confidence']})")
                 logger.info(f"Mobile app analysis for {lead['business_name']}: {'Available' if mobile_app_analysis['has_mobile_app'] else 'Not available'} (quality: {mobile_app_analysis['app_quality_score']})")
                 logger.info(f"Digital infrastructure score for {lead['business_name']}: {digital_infrastructure_analysis['overall_score']}/100 ({digital_infrastructure_analysis['tier']}) - Readiness: {digital_infrastructure_analysis['digital_readiness']}/100")
                 logger.info(f"Gym pain analysis for {lead['business_name']}: pain_score={gym_pain_analysis['pain_score']}, urgency={gym_pain_analysis['urgency_level']}, primary_category={gym_pain_analysis['primary_pain_category']}")
@@ -3090,6 +3286,9 @@ class LeadProcessor:
                 # Decision maker fields
                 'gym_decision_structure', 'gym_contact_quality', 'gym_owner_identified',
                 'gym_management_level', 'gym_decision_accessibility', 'gym_decision_factors',
+                # Budget estimation fields
+                'gym_software_budget_total', 'gym_budget_confidence', 'gym_budget_factors',
+                'gym_recommended_package', 'gym_pricing_tier', 'gym_competitor_spend',
                 'screenshot_url', 'logo_url', 'logo_extraction_method', 'logo_fallback_generated', 
                 'logo_quality_score', 'logo_valid', 'pdf_url', 'error_notes'
             ]
