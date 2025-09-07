@@ -8,8 +8,19 @@ import pandas as pd
 from datetime import datetime
 
 # Load the scraped data
-with open('bakersfield_gyms_raw_20250725_161341.json', 'r') as f:
-    gyms = json.load(f)
+# Try to load the most recent scraped data file
+import glob
+json_files = glob.glob('bakersfield_gyms_raw_*.json')
+
+if json_files:
+    # Use the most recent file
+    latest_file = max(json_files)
+    with open(latest_file, 'r') as f:
+        gyms = json.load(f)
+    print(f"\n📂 Loaded {len(gyms)} gyms from {latest_file}")
+else:
+    print("\n⚠️  No scraped data files found - running with demo analysis data")
+    gyms = []  # Will use the hardcoded analysis below
 
 print("\n" + "="*80)
 print("TOP INDEPENDENT GYM OPPORTUNITIES IN BAKERSFIELD")
