@@ -1,12 +1,12 @@
 # Contributing to RedFlag
 
-> **Internal Team Development Guidelines**
+> **Open Source Development Guidelines**
 
-Thank you for contributing to RedFlag! This document outlines our development standards, workflow, and best practices for authorized team members.
+Thank you for contributing to RedFlag! This document outlines our development standards, workflow, and best practices for all contributors.
 
-## 🚨 Important Notice
+## 🎉 Welcome Contributors!
 
-This is a **proprietary project** with restricted access. All contributions must be made by authorized team members only. Unauthorized access, copying, or distribution is strictly prohibited.
+This is an **open source project** and we welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
 
 ## 🔄 Development Workflow
 
@@ -492,8 +492,8 @@ Screenshots, logs, or other relevant information
 ## Questions?
 
 For any questions about contributing, reach out to:
-- **Tech Lead**: [name@company.com]
-- **DevOps**: [devops@company.com]
-- **Product Owner**: [po@company.com]
+- **Project Maintainer**: gnatt@usfca.edu
+- **Orrix Team**: orrixteam@gmail.com
+- **GitHub Issues**: https://github.com/gurnoornatt/supergoodleadgen/issues
 
 *Together we build better lead generation systems!* 🚀
