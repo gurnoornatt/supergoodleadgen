@@ -148,9 +148,15 @@ Thumbs.db
 *.bmp
 *.tiff
 *.webp
+*.json
+!package.json
+!package-lock.json
+!.vscode/settings.json
 screenshots/
 cloud_screenshots/
 validation_reports/
+fallback_logos/
+logos/
 *.output.*
 *_output.*
 *_test.*
@@ -160,6 +166,11 @@ demo_*.csv
 final_*.csv
 rigorous_*.csv
 leads_*.csv
+*_gyms_*.csv
+*_gyms_*.json
+*_leads_*.csv
+*_analysis.csv
+bakersfield_*
 
 # Taskmaster generated files (keep config but ignore state)
 .taskmaster/state.json
