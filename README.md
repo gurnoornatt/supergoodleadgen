@@ -1,11 +1,11 @@
 # RedFlag: Pain-Gap Audit Automation
 
-> **Enterprise Lead Generation & Digital Assessment Platform for Central Valley Markets**
+> **Enterprise Lead Generation & Digital Assessment Platform by Orrix**
 
 RedFlag is a sophisticated B2B lead generation and assessment platform designed specifically for small business outreach in California's Central Valley. The system automates the discovery, qualification, and analysis of independent businesses, generating actionable Pain-Gap Audits that identify digital infrastructure gaps and revenue opportunities.
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](#license)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](#license)
 [![Status: Active Development](https://img.shields.io/badge/status-active%20development-brightgreen.svg)]()
 
 ## 🎯 Project Overview
@@ -41,8 +41,8 @@ RedFlag addresses a critical gap in the Central Valley market: **independent bus
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourorg/redflag.git
-cd redflag
+git clone https://github.com/gurnoornatt/supergoodleadgen.git
+cd supergoodleadgen
 
 # Install dependencies
 pip install -r requirements.txt
@@ -363,26 +363,26 @@ This is a proprietary project limited to authorized team members only. Please re
 
 ## 📄 License
 
-**Proprietary Software - Team Access Only**
+**MIT License - Open Source**
 
-This software is proprietary and confidential. It is licensed exclusively for use by authorized team members of [Your Organization]. Unauthorized copying, distribution, or use is strictly prohibited.
+This software is open source and available under the MIT License. You are free to use, modify, and distribute this software in accordance with the license terms.
 
-For licensing inquiries, contact: [your-email@company.com]
+For licensing inquiries, contact: orrixteam@gmail.com
 
 ## 🆘 Support
 
 ### Technical Support
-- **Internal Wiki**: [Link to internal documentation]
-- **Slack Channel**: #redflag-support
-- **Issue Tracking**: GitHub Issues (private repository)
+- **GitHub Issues**: [Report bugs and request features](https://github.com/gurnoornatt/supergoodleadgen/issues)
+- **Email Support**: orrixteam@gmail.com
+- **Documentation**: See README.md and docs/ folder
 
-### Emergency Contacts
-- **Lead Developer**: [Developer Name] - [email@company.com]
-- **DevOps**: [DevOps Name] - [devops@company.com]
-- **Product Owner**: [PO Name] - [po@company.com]
+### Project Contacts
+- **Lead Developer**: gnatt@usfca.edu
+- **Company**: Orrix - orrixteam@gmail.com
+- **Project Maintainer**: gnatt@usfca.edu
 
 ---
 
-**Built with ❤️ for the Central Valley business community**
+**Built with ❤️ by Orrix for the Central Valley business community**
 
 *Empowering independent businesses through intelligent lead generation and digital transformation insights.*
