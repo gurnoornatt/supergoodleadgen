@@ -1,0 +1,113 @@
+# RedFlag Development Dependencies
+# Additional tools for development, testing, and code quality
+
+# ==============================================================================
+# TESTING FRAMEWORK
+# ==============================================================================
+
+# Core testing
+pytest>=7.4.0
+pytest-cov>=4.1.0              # Coverage reporting
+pytest-mock>=3.11.0            # Mocking utilities
+pytest-xdist>=3.3.0            # Parallel testing
+pytest-html>=3.2.0             # HTML test reports
+
+# Test fixtures and utilities
+factory-boy>=3.3.0             # Test data generation
+responses>=0.23.0               # HTTP response mocking
+freezegun>=1.2.0                # Time mocking
+
+# ==============================================================================
+# CODE QUALITY & FORMATTING
+# ==============================================================================
+
+# Code formatting
+black>=23.0.0                   # Python code formatter
+isort>=5.12.0                   # Import sorting
+
+# Linting
+flake8>=6.0.0                   # Style guide enforcement
+flake8-docstrings>=1.7.0        # Docstring linting
+flake8-import-order>=0.18.0     # Import order checking
+bandit>=1.7.0                   # Security linting
+
+# Type checking
+mypy>=1.4.0                     # Static type checking
+types-requests>=2.31.0          # Type stubs for requests
+types-beautifulsoup4>=4.12.0    # Type stubs for BeautifulSoup
+
+# ==============================================================================
+# DEVELOPMENT TOOLS
+# ==============================================================================
+
+# Pre-commit hooks
+pre-commit>=3.3.0               # Git hook framework
+
+# Documentation
+sphinx>=7.1.0                   # Documentation generator
+sphinx-rtd-theme>=1.3.0         # ReadTheDocs theme
+
+# Debugging and profiling
+ipdb>=0.13.0                    # Enhanced debugger
+memory-profiler>=0.61.0         # Memory usage profiling
+line-profiler>=4.1.0            # Line-by-line profiling
+
+# ==============================================================================
+# API TESTING & MOCKING
+# ==============================================================================
+
+# HTTP testing
+httpx>=0.24.0                   # Modern HTTP client for testing
+respx>=0.20.0                   # HTTPX mocking
+
+# API mocking
+wiremock>=2.6.0                 # API service mocking
+pytest-httpserver>=1.0.0       # Local HTTP server for tests
+
+# ==============================================================================
+# PERFORMANCE TESTING
+# ==============================================================================
+
+# Load testing
+locust>=2.15.0                  # Load testing framework
+
+# Benchmarking
+pytest-benchmark>=4.0.0        # Performance benchmarking
+
+# ==============================================================================
+# JUPYTER & ANALYSIS
+# ==============================================================================
+
+# Jupyter notebooks (for analysis and exploration)
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+notebook>=7.0.0
+
+# Data visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# ==============================================================================
+# DEPLOYMENT & CONTAINERIZATION
+# ==============================================================================
+
+# Docker utilities
+docker>=6.1.0                   # Docker SDK
+docker-compose>=1.29.0          # Docker Compose
+
+# ==============================================================================
+# SECURITY SCANNING
+# ==============================================================================
+
+# Dependency scanning
+safety>=2.3.0                   # Known vulnerability scanning
+pip-audit>=2.6.0                # Package vulnerability scanning
+
+# ==============================================================================
+# DATABASE TESTING (if needed)
+# ==============================================================================
+
+# Database testing utilities
+pytest-postgresql>=5.0.0       # PostgreSQL testing
+fakeredis>=2.15.0               # Redis mocking
