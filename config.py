@@ -53,6 +53,30 @@ class Config:
         'real estate',
         'contractors'
     ]
+    
+    # Gym and Fitness Categories for specialized scraping
+    GYM_FITNESS_CATEGORIES = [
+        'gyms',
+        'fitness centers',
+        'health clubs',
+        'personal trainers',
+        'yoga studios',
+        'pilates studios',
+        'crossfit gyms',
+        'martial arts schools',
+        'dance studios',
+        'sports clubs',
+        'recreation centers',
+        'swimming pools',
+        'tennis clubs',
+        'boxing gyms',
+        'bootcamp fitness',
+        'cycle studios',
+        'rock climbing gyms',
+        'wellness centers',
+        'physical therapy',
+        'sports medicine clinics'
+    ]
 
     @classmethod
     def validate_config(cls):
