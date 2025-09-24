@@ -1,0 +1,212 @@
+[
+  {
+    "gym_name": "Tower Yoga",
+    "analysis_date": "2025-09-16T22:08:20.025360",
+    "roi_analysis": {
+      "current_mobile_score": 71,
+      "target_mobile_score": 70,
+      "score_improvement": -1,
+      "current_monthly_losses": {
+        "lost_memberships": 0,
+        "lost_pt_sessions": 0,
+        "admin_time_costs": 660,
+        "lost_local_search": 0,
+        "total_monthly_loss": 660
+      },
+      "current_annual_losses": 7920,
+      "improvement_benefits": {
+        "increased_memberships": 406.25,
+        "increased_pt_bookings": 5625.0,
+        "admin_time_savings": 461.99999999999994,
+        "improved_retention": 812.5,
+        "new_revenue_streams": 0,
+        "total_monthly_benefit": 7305.75
+      },
+      "monthly_benefit_total": 7305.75,
+      "annual_benefit_total": 87669.0,
+      "total_monthly_gain": 7965.75,
+      "total_annual_gain": 95589.0,
+      "implementation_costs": {
+        "one_time": 1050,
+        "monthly": 0,
+        "implementation_weeks": 2.5
+      },
+      "total_investment": 1050,
+      "roi_percentage": 9103.714285714286,
+      "payback_months": 0.1318143301007438,
+      "break_even_date": "2025-09-20",
+      "revenue_multiple": 91.03714285714285,
+      "monthly_roi": 758.6428571428572,
+      "confidence_level": "Medium",
+      "risk_factors": [],
+      "success_indicators": [
+        "Booking system will show direct revenue attribution",
+        "Very quick payback period indicates strong ROI"
+      ]
+    },
+    "before_after_comparison": {
+      "before": {
+        "mobile_score": 71,
+        "monthly_revenue_loss": 660,
+        "annual_impact": 7920,
+        "user_experience": "Poor mobile experience, high bounce rate",
+        "business_efficiency": "High admin time, missed opportunities",
+        "competitive_position": "Behind competitors with better mobile sites"
+      },
+      "after": {
+        "mobile_score": 70,
+        "monthly_revenue_gain": 7965.75,
+        "annual_impact": 95589.0,
+        "user_experience": "Excellent mobile experience, easy conversions",
+        "business_efficiency": "Automated booking, reduced admin time",
+        "competitive_position": "Leading local gyms in digital experience"
+      },
+      "improvement": {
+        "score_increase": -1,
+        "monthly_swing": 8625.75,
+        "annual_swing": 103509.0,
+        "roi_percentage": 9103.714285714286,
+        "payback_months": 0.1318143301007438
+      }
+    },
+    "sales_presentation": {
+      "executive_summary": {
+        "investment": 1050,
+        "annual_return": 95589.0,
+        "roi_percentage": "9104%",
+        "payback_period": "0.1 months",
+        "confidence": "Medium"
+      },
+      "problem_statement": {
+        "current_mobile_score": "71/100",
+        "monthly_losses": "$660",
+        "annual_losses": "$7,920",
+        "main_issues": [
+          "High admin costs from phone calls"
+        ]
+      },
+      "solution_benefits": {
+        "score_improvement": "+-1 points",
+        "monthly_gain": "$7,966",
+        "annual_gain": "$95,589",
+        "key_features": []
+      },
+      "financial_projection": {
+        "year_1_net": 94539.0,
+        "year_2_net": 95589.0,
+        "year_3_net": 95589.0,
+        "three_year_total": 285717.0
+      },
+      "next_steps": {
+        "implementation_timeline": 2.5,
+        "break_even_date": "2025-09-20",
+        "first_results_timeline": "2-4 weeks after launch"
+      }
+    }
+  },
+  {
+    "gym_name": "Certus CrossFit",
+    "analysis_date": "2025-09-16T22:08:20.025380",
+    "roi_analysis": {
+      "current_mobile_score": 66,
+      "target_mobile_score": 75,
+      "score_improvement": 9,
+      "current_monthly_losses": {
+        "lost_memberships": 268.5150000000001,
+        "lost_pt_sessions": 118.46249999999999,
+        "admin_time_costs": 0,
+        "lost_local_search": 0,
+        "total_monthly_loss": 386.9775000000001
+      },
+      "current_annual_losses": 4643.730000000001,
+      "improvement_benefits": {
+        "increased_memberships": 382.5,
+        "increased_pt_bookings": 4050.0,
+        "admin_time_savings": 0,
+        "improved_retention": 0,
+        "new_revenue_streams": 0,
+        "total_monthly_benefit": 4432.5
+      },
+      "monthly_benefit_total": 4432.5,
+      "annual_benefit_total": 53190.0,
+      "total_monthly_gain": 4819.4775,
+      "total_annual_gain": 57833.729999999996,
+      "implementation_costs": {
+        "one_time": 650,
+        "monthly": 0,
+        "implementation_weeks": 1.5
+      },
+      "total_investment": 650,
+      "roi_percentage": 8897.496923076922,
+      "payback_months": 0.13486939196209546,
+      "break_even_date": "2025-09-20",
+      "revenue_multiple": 88.97496923076922,
+      "monthly_roi": 741.4580769230769,
+      "confidence_level": "Medium",
+      "risk_factors": [],
+      "success_indicators": [
+        "Booking system will show direct revenue attribution",
+        "Very quick payback period indicates strong ROI"
+      ]
+    },
+    "before_after_comparison": {
+      "before": {
+        "mobile_score": 66,
+        "monthly_revenue_loss": 386.9775000000001,
+        "annual_impact": 4643.730000000001,
+        "user_experience": "Poor mobile experience, high bounce rate",
+        "business_efficiency": "High admin time, missed opportunities",
+        "competitive_position": "Behind competitors with better mobile sites"
+      },
+      "after": {
+        "mobile_score": 75,
+        "monthly_revenue_gain": 4819.4775,
+        "annual_impact": 57833.729999999996,
+        "user_experience": "Excellent mobile experience, easy conversions",
+        "business_efficiency": "Automated booking, reduced admin time",
+        "competitive_position": "Leading local gyms in digital experience"
+      },
+      "improvement": {
+        "score_increase": 9,
+        "monthly_swing": 5206.455,
+        "annual_swing": 62477.46,
+        "roi_percentage": 8897.496923076922,
+        "payback_months": 0.13486939196209546
+      }
+    },
+    "sales_presentation": {
+      "executive_summary": {
+        "investment": 650,
+        "annual_return": 57833.729999999996,
+        "roi_percentage": "8897%",
+        "payback_period": "0.1 months",
+        "confidence": "Medium"
+      },
+      "problem_statement": {
+        "current_mobile_score": "66/100",
+        "monthly_losses": "$387",
+        "annual_losses": "$4,644",
+        "main_issues": [
+          "Significant membership losses"
+        ]
+      },
+      "solution_benefits": {
+        "score_improvement": "+9 points",
+        "monthly_gain": "$4,819",
+        "annual_gain": "$57,834",
+        "key_features": []
+      },
+      "financial_projection": {
+        "year_1_net": 57183.729999999996,
+        "year_2_net": 57833.729999999996,
+        "year_3_net": 57833.729999999996,
+        "three_year_total": 172851.19
+      },
+      "next_steps": {
+        "implementation_timeline": 1.5,
+        "break_even_date": "2025-09-20",
+        "first_results_timeline": "2-4 weeks after launch"
+      }
+    }
+  }
+]

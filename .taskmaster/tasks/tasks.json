@@ -963,628 +963,494 @@
   "gym-software-leads": {
     "tasks": [
       {
-        "id": 1,
-        "title": "Update Lead Scraping for Gym Categories",
-        "description": "Modify the existing SerpApi Google Maps scraping to target gym and fitness businesses with comprehensive category coverage.",
+        "id": 16,
+        "title": "Setup AI Sales Intelligence Agent Environment",
+        "description": "Create complete project setup with LangChain, Groq API, and Playwright dependencies for AI-powered gym lead processing",
         "status": "done",
-        "priority": "high",
         "dependencies": [],
-        "details": "Update search categories to include: 'gym', 'fitness center', 'health club', 'personal training', 'crossfit', 'yoga studio', 'pilates studio', 'boxing gym', 'martial arts school', 'dance studio', 'swimming pool', 'boot camp', 'functional training', 'strength training', 'cardio studio'. Enhance lead data structure to include gym-specific fields like gym size indicators, services offered, location type, and membership models.",
-        "testStrategy": "Test scraping with new gym categories, verify all gym types are captured, test with different cities and regions.",
+        "priority": "high",
+        "details": "Install required packages: langchain-core (latest), langchain-groq (0.3.8+), playwright, pandas (2.3.2+), tqdm (latest), python-dotenv (latest). Note: argparse is built-in to Python and doesn't need installation. Create new requirements.txt specifically for AI sales agent with Python >=3.9 requirement. Add GROQ_API_KEY to existing .env.example and verify .gitignore already covers .env and *.csv files. Run 'pip install playwright' followed by 'playwright install' for browser dependencies. Verify meta-llama/llama-4-scout-17b-16e-instruct model availability on Groq API. Update project structure to separate AI agent functionality from existing pain-gap audit tools in /Users/gunny/CsProjects/personalProjects/redflag/.",
+        "testStrategy": "Verify all dependencies install successfully with Python >=3.9, confirm Groq API connection with test call using meta-llama/llama-4-scout-17b-16e-instruct model, validate Playwright browser installation, test environment variable loading",
         "subtasks": [
           {
             "id": 1,
-            "title": "Update search categories for gym and fitness businesses",
-            "description": "Expand category list to cover all gym and fitness business types",
-            "details": "Add comprehensive list of gym categories, test each category for lead quality, optimize search terms",
+            "title": "Install Dependencies and Create Requirements File",
+            "description": "Install all required Python packages with correct versions and create comprehensive requirements.txt for AI sales agent",
             "status": "done",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "Install langchain-core (latest), langchain-groq (version 0.3.8+), playwright, pandas (2.3.2+), tqdm (latest), python-dotenv (latest) using pip. Skip argparse as it's built-in to Python. Create new ai_requirements.txt file specifically for AI sales agent functionality with pinned versions for reproducibility and Python >=3.9 requirement. Test that all packages install cleanly without conflicts on the existing project structure at /Users/gunny/CsProjects/personalProjects/redflag/.",
+            "testStrategy": "Verify all packages install with pip, confirm Python >=3.9 compatibility, test import statements for all packages"
           },
           {
             "id": 2,
-            "title": "Enhance lead data structure with gym-specific fields",
-            "description": "Add gym-specific data fields to capture business characteristics",
-            "details": "Add fields for gym size, services offered, location type, membership models, equipment types",
+            "title": "Configure Environment Variables and Git Settings",
+            "description": "Setup environment configuration files and verify git ignore patterns are complete",
             "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
+            "dependencies": [
+              1
+            ],
+            "details": "Add GROQ_API_KEY to existing .env.example file (which already exists at /Users/gunny/CsProjects/personalProjects/redflag/.env.example) with descriptive comments. Verify that .gitignore already excludes .env files and *.csv files from version control (files show this is already configured). Test environment variable loading works correctly with python-dotenv in the existing project structure.",
+            "testStrategy": "Confirm GROQ_API_KEY added to .env.example, verify .gitignore patterns work, test dotenv loading"
           },
           {
             "id": 3,
-            "title": "Implement gym size estimation logic",
-            "description": "Create logic to estimate gym size based on available data",
-            "details": "Analyze business descriptions, reviews, photos to estimate gym size (small/medium/large)",
+            "title": "Install and Verify Playwright Browser Dependencies",
+            "description": "Setup Playwright browser automation capabilities using correct installation method and verify installation",
             "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
+            "dependencies": [
+              1
+            ],
+            "details": "Run 'pip install playwright' followed by 'playwright install' command to download required browser binaries (not pytest-playwright as this is for library use). Test Playwright installation by creating simple browser automation script that opens a webpage, building on existing Playwright usage in the codebase (files like playwright_capture.py, robust_screenshot_capture.py already exist). Verify all required browsers (Chromium) are properly installed and functional.",
+            "testStrategy": "Verify Playwright CLI installation, test browser binary download, confirm automation script works"
+          },
+          {
+            "id": 4,
+            "title": "Verify Groq API Model Availability and Test Connection",
+            "description": "Confirm meta-llama/llama-4-scout-17b-16e-instruct model is available on Groq API and establish test connection",
+            "status": "done",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create test script to verify meta-llama/llama-4-scout-17b-16e-instruct model is available on Groq API using langchain-groq 0.3.8+. Test API connection with sample prompt to ensure the model works as expected for the AI sales intelligence agent. Document any alternative models if the specified model is not available. Ensure proper error handling for API failures.\n<info added on 2025-09-23T21:22:57.840Z>\nI'll analyze the codebase to understand the current project structure and then provide an update for the Groq API testing subtask.Test execution completed successfully: test_groq_api.py script created and executed with 100% pass rate. Verified meta-llama/llama-4-scout-17b-16e-instruct model is fully operational on Groq API using langchain-groq 0.3.8. Comprehensive testing validated API authentication, model availability, JSON response formatting (critical for structured agent outputs), and batch processing capabilities for efficiency. Test results confirm the specified model is ready for integration into the AI sales intelligence agent pipeline.\n</info added on 2025-09-23T21:22:57.840Z>",
+            "testStrategy": "Test Groq API connection, verify model availability, confirm langchain-groq integration works"
+          },
+          {
+            "id": 5,
+            "title": "Organize Project Structure for AI Agent Separation",
+            "description": "Update project directory structure to cleanly separate AI agent from existing audit tools",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "details": "Create dedicated directory structure for AI sales intelligence agent (e.g., ai_agent/ folder) within the existing project at /Users/gunny/CsProjects/personalProjects/redflag/. The project already has extensive pain-gap audit scripts (scrape_*.py, analyze_*.py files) and existing Playwright functionality. Ensure clean separation between AI agent functionality and existing tools while leveraging shared utilities where appropriate. Update import paths and document new project structure.\n<info added on 2025-09-23T21:26:12.457Z>\nFirst, let me explore the current project structure to understand the implementation details.Directory structure verified with clean separation: ai_agent/ contains config/, agents/, utils/, tests/ subdirectories with proper __init__.py files. main.py CLI fully functional with argument parsing, validation, help system, and configuration loading. Configuration system in config/settings.py successfully integrates with existing .env patterns while maintaining isolation. All imports tested and working. CLI tested with --help flag showing proper usage instructions and environment variable documentation. Project ready for next phase implementation tasks.\n</info added on 2025-09-23T21:26:12.457Z>",
+            "testStrategy": "Verify clean directory separation, test import paths, confirm existing functionality remains intact"
           }
         ]
       },
       {
-        "id": 2,
-        "title": "Gym Management Software Detection System",
-        "description": "Implement specialized technology analysis to identify what gym management software businesses are currently using.",
+        "id": 17,
+        "title": "Implement Configuration Manager and CLI Arguments",
+        "description": "Create configuration system to handle API keys, command-line arguments, and script parameters",
+        "details": "Create configuration class that loads GROQ_API_KEY from .env file or environment variables. Implement argparse for --input and --output command-line arguments. Add validation to ensure required CSV columns (gym_name, website_url) exist in input file. Include error handling for missing configuration and graceful termination with clear error messages.",
+        "testStrategy": "Test with missing API key, invalid input file, missing columns, and valid configuration scenarios",
+        "priority": "high",
+        "dependencies": [
+          16
+        ],
         "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Configuration Class for Environment Variables",
+            "description": "Implement configuration class that loads GROQ_API_KEY from .env file and environment variables with proper validation",
+            "dependencies": [],
+            "details": "Create ConfigManager class using python-dotenv to load .env file. Implement methods to get GROQ_API_KEY from environment variables with fallback to .env file. Add validation to ensure API key exists and is not empty. Include clear error messages for missing configuration.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement CLI Argument Parsing with Argparse",
+            "description": "Build command-line argument parser for --input and --output parameters with validation",
+            "dependencies": [],
+            "details": "Use argparse to create CLI interface with required --input argument for CSV file path and optional --output argument (defaults to processed_gyms.csv). Add help text and argument validation. Ensure file paths are properly handled and validated for existence (input) and writeability (output directory).",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Add Input Validation and Error Handling",
+            "description": "Implement CSV validation to ensure required columns exist with comprehensive error handling",
+            "dependencies": [
+              "17.1",
+              "17.2"
+            ],
+            "details": "Create validation function to check input CSV contains required columns (gym_name, website_url). Implement graceful error handling for missing files, invalid CSV format, missing columns, and configuration errors. Provide clear, actionable error messages and ensure clean script termination on validation failures.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Build Data I/O and State Management System",
+        "description": "Implement CSV processing, chunking, and resumption logic for interrupted script execution",
+        "details": "Create data handler that reads input CSV and validates gym_name/website_url columns. Implement chunking system to process 200 rows at a time using pandas. Build resumption logic by comparing website_url values between input and existing output files to determine where to restart. Add output CSV structure with columns: original data + status, error_message, analysis_json, generated_email.",
+        "testStrategy": "Test resumption after interruption, validate chunking processes correct number of rows, verify output CSV format matches specification",
         "priority": "high",
         "dependencies": [
-          1
+          17
         ],
-        "details": "Enhance BuiltWith API analysis to specifically identify gym management software like MindBody, Zen Planner, TeamUp, Glofox, Wodify, PushPress, WellnessLiving, ClubReady, ABC Financial, etc. Create scoring system for software quality and age. Identify businesses using outdated or problematic gym software.",
-        "testStrategy": "Test with gym websites using known management software, verify detection accuracy, test scoring system.",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create gym management software database",
-            "description": "Build comprehensive database of gym management software platforms",
-            "details": "Research and catalog all major gym software platforms, their features, pricing, and technology stack",
-            "status": "done",
+            "title": "Create CSV Reader and Column Validator",
+            "description": "Implement data handler to read input CSV files and validate required gym_name and website_url columns",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "Build CSV reading functionality using pandas with proper error handling for file access issues. Implement column validation to ensure gym_name and website_url columns exist and contain valid data. Add data type validation and handle missing values appropriately. Include informative error messages for validation failures.\n<info added on 2025-09-23T22:35:52.065Z>\nI'll analyze the codebase to understand the current CSV reading implementation and provide an appropriate update for the subtask.IMPLEMENTATION COMPLETE: Comprehensive CSV Reader and Column Validator successfully built with all required functionality including file validation, auto-column mapping (business_name->gym_name, website->website_url), chunked reading with pandas TextFileReader, data quality validation with statistics, memory-efficient processing for large files, custom exception handling, and production-ready logging. Testing confirmed successful validation of real gym data (641 rows with 0 processable due to missing websites) and test data (5 rows processed successfully). Code passes flake8 standards and implements proper separation of concerns with URLValidator integration. Features include comprehensive error handling for missing files/invalid formats, memory optimization for 100MB+ files, and detailed validation reporting for debugging and quality assurance.\n</info added on 2025-09-23T22:35:52.065Z>",
+            "status": "done",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Enhance BuiltWith analysis for gym software detection",
-            "description": "Modify BuiltWith API analysis to specifically identify gym management software",
-            "details": "Update technology detection logic, add gym software signatures, improve detection accuracy",
+            "title": "Implement Row Chunking System",
+            "description": "Create chunking mechanism to process CSV data in batches of 200 rows using pandas",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "Implement DataFrame chunking logic that splits input data into 200-row batches for processing. Use pandas chunk functionality with proper memory management. Add chunk indexing and tracking for progress monitoring. Ensure last chunk handles remainder rows correctly when total rows not divisible by 200.\n<info added on 2025-09-23T22:37:39.222Z>\nLooking at the codebase to verify the chunking implementation that was completed:COMPLETION STATUS: Task completed successfully with comprehensive verification through production testing with 641 gym records. The chunking system was already fully implemented in csv_reader.py:349-387 (create_chunked_reader) and csv_reader.py:497-536 (CSVProcessor.process_chunks).\n\nVERIFIED IMPLEMENTATION:\n- Uses pandas read_csv(chunksize=200) returning TextFileReader iterator for memory-efficient processing\n- CSVProcessor.process_chunks() provides chunk indexing, progress tracking, and validation per chunk \n- Handles remainder rows correctly through pandas automatic chunk management\n- Tested with edge cases: oversized chunks (chunk_size=10, rows=5), undersized chunks (chunk_size=2, rows=5), and production data (chunk_size=200, rows=641)\n- Performance validated: Independent DataFrame processing prevents memory accumulation\n- Configuration integrated: Default 200-row chunks configurable via CHUNK_SIZE environment variable\n\nPRODUCTION READY: All requirements met and validated through comprehensive testing with real gym lead data.\n</info added on 2025-09-23T22:37:39.222Z>",
             "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Create gym software quality scoring system",
-            "description": "Develop scoring system to evaluate gym software quality and age",
-            "details": "Score software based on age, features, mobile app availability, integration capabilities",
+            "title": "Build Resumption Logic with URL Comparison",
+            "description": "Create state management system that compares website_url values between input and output files to determine restart point",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "Implement resumption detection by reading existing output CSV and extracting processed website_url values. Create comparison algorithm that identifies the last successfully processed row in input file. Build logic to skip already processed rows and resume from correct position. Handle edge cases like partial processing and corrupted output files.",
             "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Define Output CSV Structure and Column Mapping",
+            "description": "Create output CSV format with original data plus analysis columns: status, error_message, analysis_json, generated_email",
+            "dependencies": [
+              "18.2",
+              "18.3"
+            ],
+            "details": "Define output CSV schema that preserves all original input columns while adding new analysis columns. Implement column mapping function that combines original gym data with processing results. Create proper data serialization for analysis_json field and ensure CSV-safe formatting. Add header generation and file writing functionality with proper encoding.",
+            "status": "done",
+            "testStrategy": ""
           }
         ]
       },
       {
-        "id": 3,
-        "title": "Gym Website and App Analysis",
-        "description": "Implement specialized analysis for gym websites and mobile apps to identify digital infrastructure gaps.",
-        "status": "in-progress",
+        "id": 19,
+        "title": "Implement Playwright Web Content Renderer",
+        "description": "Create async Playwright system for efficiently rendering JavaScript-heavy gym websites",
+        "status": "done",
+        "dependencies": [
+          16
+        ],
+        "priority": "medium",
+        "details": "Build async Playwright worker pool for parallel website rendering using 'from playwright.async_api import async_playwright' with async context manager pattern. Configure requests to block images and CSS stylesheets for faster loading via route interception. Set 15-second navigation timeout as specified. Extract full HTML content from rendered pages. Implement error handling for timeouts, 404s, and connection failures. Use proper browser context isolation with browser.new_context() for parallel processing. Ensure compatibility with Python 3.9+ requirements.",
+        "testStrategy": "Test with various website types, verify timeout handling, confirm resource blocking improves speed, validate HTML extraction quality, test parallel worker pool performance",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup async Playwright browser and context management",
+            "description": "Initialize Playwright browser instance with async support using async_playwright context manager",
+            "status": "done",
+            "dependencies": [],
+            "details": "Use 'from playwright.async_api import async_playwright' with async context manager pattern. Create async browser launcher with headless mode, configure browser contexts using browser.new_context() for proper isolation in parallel processing. Implement proper context management for concurrent website rendering operations.",
+            "testStrategy": "Verify async_playwright import works, test browser launch/close, confirm context isolation"
+          },
+          {
+            "id": 2,
+            "title": "Implement worker pool for parallel website processing",
+            "description": "Build asyncio-based worker pool system to handle multiple website renders concurrently",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Create asyncio-based worker pool with configurable concurrency limits, implement task queue management for distributing website rendering jobs across workers, ensure proper load balancing. Each worker should maintain its own browser context for isolation.",
+            "testStrategy": "Test concurrent processing, verify worker isolation, confirm load balancing"
+          },
+          {
+            "id": 3,
+            "title": "Configure resource blocking for performance optimization",
+            "description": "Set up request interception via route blocking to block images and CSS for faster page loading",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement Playwright route blocking for image and CSS resources using route interception methods. Configure network conditions for minimal resource loading while preserving JavaScript execution. Validate performance improvements compared to full resource loading.",
+            "testStrategy": "Measure load time improvements, verify JS still executes, confirm blocked resources"
+          },
+          {
+            "id": 4,
+            "title": "Implement timeout and comprehensive error handling",
+            "description": "Add robust error handling for navigation timeouts, 404s, and connection failures",
+            "status": "done",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Set 15-second navigation timeout as specified in requirements. Implement try-catch blocks for timeout exceptions, handle 404 errors and connection failures gracefully. Add retry logic for transient failures. Ensure compatibility with Python 3.9+ exception handling patterns.",
+            "testStrategy": "Test timeout scenarios, verify 404 handling, confirm retry logic works"
+          },
+          {
+            "id": 5,
+            "title": "Extract HTML content with proper cleanup management",
+            "description": "Implement HTML content extraction and ensure proper browser resource cleanup",
+            "status": "done",
+            "dependencies": [
+              4
+            ],
+            "details": "Extract full rendered HTML content from pages after JavaScript execution using page.content() method. Implement async context managers for automatic browser cleanup, ensure proper disposal of browser instances and contexts to prevent memory leaks. Handle cleanup in worker pool shutdown scenarios.",
+            "testStrategy": "Verify HTML extraction quality, confirm no memory leaks, test cleanup on errors"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Create LangChain AI Agent Orchestrator",
+        "description": "Build two-phase AI analysis system using LangChain and Groq API for gym website evaluation",
+        "status": "pending",
+        "dependencies": [
+          16,
+          19
+        ],
+        "priority": "high",
+        "details": "Implement LangChain client for Groq API using meta-llama/llama-4-scout-17b-16e-instruct model. Create Analysis Agent with exact prompt: 'You are a precise data extraction bot. Analyze the provided website HTML content. Respond ONLY with a valid JSON object matching this exact schema: {\"has_online_booking\": boolean, \"has_online_membership_sales\": boolean, \"uses_generic_contact_form\": boolean, \"mentions_24_7_access\": boolean, \"has_member_portal\": boolean}. Do not include any explanatory text. Website Content: {html_content}'. Use ChatGroq.abatch() method for efficient batched API calls. Integrate with existing api_client.py patterns and config.py environment variable management.",
+        "testStrategy": "Verify JSON schema compliance, test batch processing efficiency with ChatGroq.abatch(), validate analysis accuracy against known gym websites, ensure integration with existing config.py GROQ_API_KEY management",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup LangChain Client for Groq API",
+            "description": "Configure LangChain client with Groq API integration using meta-llama/llama-4-scout-17b-16e-instruct model",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Install langchain-groq package (version 0.3.8+), configure ChatGroq client from langchain_groq import with GROQ_API_KEY environment variable from config.py. Set model to 'meta-llama/llama-4-scout-17b-16e-instruct', configure temperature=0 for consistent JSON output, add timeout and retry configurations. Follow existing api_client.py patterns for error handling and rate limiting. Add GROQ_API_KEY to config.py class and .env.example file.",
+            "testStrategy": "Test ChatGroq client initialization, verify model availability, confirm JSON response consistency with temperature=0"
+          },
+          {
+            "id": 2,
+            "title": "Implement Analysis Agent with JSON Schema",
+            "description": "Create Analysis Agent with exact prompt specification and JSON schema validation for gym website evaluation",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement AnalysisAgent class following api_client.py patterns with exact prompt: 'You are a precise data extraction bot. Analyze the provided website HTML content. Respond ONLY with a valid JSON object matching this exact schema: {\"has_online_booking\": boolean, \"has_online_membership_sales\": boolean, \"uses_generic_contact_form\": boolean, \"mentions_24_7_access\": boolean, \"has_member_portal\": boolean}. Do not include any explanatory text. Website Content: {html_content}'. Add JSON schema validation using existing jsonschema library (already in requirements.txt) to ensure response compliance. Include error handling for malformed JSON responses.",
+            "testStrategy": "Validate exact JSON schema output, test with various HTML content types, verify error handling for malformed responses"
+          },
+          {
+            "id": 3,
+            "title": "Build Batch Processing System",
+            "description": "Implement efficient batch processing using LangChain's ChatGroq.abatch() method for multiple gym website analyses",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement batch processing system using ChatGroq.abatch() method to process multiple gym websites simultaneously. Configure optimal batch sizes for Groq API rate limits, implement retry logic with exponential backoff following tenacity patterns from api_client.py. Add concurrent processing while respecting API constraints, integrate with existing tqdm progress bars from requirements.txt. Target 20-second processing for 100 gym analyses with proper error recovery.",
+            "testStrategy": "Benchmark batch processing speed, test retry mechanisms, verify progress bar integration, confirm 20-second target achievement"
+          },
+          {
+            "id": 4,
+            "title": "Implement Response Parsing and Error Handling",
+            "description": "Create robust JSON response parsing with comprehensive error handling for malformed responses",
+            "status": "pending",
+            "dependencies": [
+              3
+            ],
+            "details": "Build response parser to extract JSON from LLM responses, handle malformed JSON with json.loads() error catching following existing api_client.py error patterns. Implement fallback strategies for invalid responses, integrate with logger_config.py for structured logging with specific gym identifiers. Ensure graceful degradation when AI responses don't match expected schema, maintain processing continuity despite individual failures. Add response validation against expected boolean schema fields.",
+            "testStrategy": "Test malformed JSON handling, verify logging integration, confirm graceful failure recovery, validate schema compliance checking"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "title": "Implement Email Generation Agent",
+        "description": "Create AI-powered personalized sales email generator based on gym analysis results",
+        "details": "Build Email Agent using LangChain with exact prompt: 'You are a helpful sales assistant for a Gym Operating System company. Your goal is to write a brief, friendly, and compelling sales email under 150 words to the gym owner. Use the provided analysis to connect one of their specific operational weaknesses to a feature of our software. End with a clear call to action. Gym Name: {gym_name}. Analysis: {analysis_json}'. Integrate with batched Groq API calls for efficiency.",
+        "testStrategy": "Verify emails are under 150 words, confirm personalization based on analysis, validate call-to-action presence, test batch processing",
         "priority": "high",
         "dependencies": [
-          1
+          20
         ],
-        "details": "Analyze gym websites for online booking capabilities, class scheduling, membership management, payment processing, member portals. Check for mobile app availability and quality. Identify businesses with poor online presence or outdated booking systems. Create scoring for digital infrastructure completeness.",
-        "testStrategy": "Test analysis with various gym websites, verify feature detection accuracy, test scoring system.",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "Implement gym website feature analysis",
-            "description": "Analyze gym websites for key digital features",
-            "details": "Check for online booking, class scheduling, membership management, payment processing, member portals",
-            "status": "in-progress",
+            "title": "Implement LangChain Email Agent with Exact Prompt",
+            "description": "Create LangChain-based email generation agent with the specified sales assistant prompt and template formatting",
             "dependencies": [],
-            "parentTaskId": 3
+            "details": "Build LangChain agent using exact prompt: 'You are a helpful sales assistant for a Gym Operating System company. Your goal is to write a brief, friendly, and compelling sales email under 150 words to the gym owner. Use the provided analysis to connect one of their specific operational weaknesses to a feature of our software. End with a clear call to action. Gym Name: {gym_name}. Analysis: {analysis_json}'. Implement proper template variable substitution for gym_name and analysis_json parameters.",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Create mobile app detection system",
-            "description": "Detect and analyze gym mobile apps",
-            "details": "Check for mobile app availability, analyze app store ratings, identify app quality issues",
+            "title": "Integrate Batched Groq API Calls for Efficiency",
+            "description": "Implement efficient batched API processing for email generation to minimize API costs and improve throughput",
+            "dependencies": [
+              "21.1"
+            ],
+            "details": "Create batched processing system for Groq API calls that groups multiple email generation requests together. Implement async request handling with proper rate limiting and error handling. Configure batch size optimization based on API limits and processing efficiency. Include retry logic for failed API calls and proper response parsing.",
             "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 3
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Develop digital infrastructure scoring",
-            "description": "Create scoring system for gym digital infrastructure completeness",
-            "details": "Score based on website features, mobile app quality, online booking capabilities, member experience",
+            "title": "Implement Email Validation and Quality Control",
+            "description": "Add validation system to ensure generated emails meet word count limits and contain required call-to-action elements",
+            "dependencies": [
+              "21.2"
+            ],
+            "details": "Create validation functions to verify emails are under 150 words as specified. Implement call-to-action detection to ensure each email contains a clear next step for the gym owner. Add quality checks for personalization elements and proper gym name inclusion. Include error handling and regeneration logic for emails that fail validation criteria.",
             "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 3
+            "testStrategy": ""
           }
         ]
       },
       {
-        "id": 4,
-        "title": "Gym-Specific Pain Scoring Algorithm",
-        "description": "Create specialized pain scoring algorithm for gym and fitness businesses based on their unique needs.",
+        "id": 22,
+        "title": "Build Comprehensive Error Handling and Retry System",
+        "description": "Implement resilient error handling with exponential backoff for all failure scenarios",
+        "details": "Create error classification system: Non-Recoverable (404s, timeouts) - log and continue; Recoverable (API 503, network timeouts) - retry up to 3 times with exponential backoff; Validation (malformed JSON) - retry analysis up to 2 times. Implement proper exception handling throughout the pipeline. Add graceful degradation when individual leads fail while continuing batch processing.",
+        "testStrategy": "Test each error type scenario, verify retry counts and backoff timing, confirm batch processing continues after individual failures",
+        "priority": "medium",
+        "dependencies": [
+          19,
+          20
+        ],
         "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Error Classification System",
+            "description": "Create comprehensive error classification framework for different failure types",
+            "dependencies": [],
+            "details": "Define error categories: Non-Recoverable (404s, connection timeouts, DNS failures), Recoverable (API 503, temporary network issues, rate limits), and Validation (malformed JSON, parsing errors). Create error class hierarchy with proper exception types and classification logic. Design configuration structure for retry policies per error type.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Exponential Backoff Retry Logic",
+            "description": "Build configurable retry mechanism with exponential backoff for recoverable errors",
+            "dependencies": [
+              "22.1"
+            ],
+            "details": "Implement retry decorator with exponential backoff algorithm (base delay * 2^attempt). Configure maximum retry attempts: 3 for recoverable errors, 2 for validation errors. Add jitter to prevent thundering herd. Include timeout handling and circuit breaker pattern for persistent failures.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Integrate Exception Handling Throughout Pipeline",
+            "description": "Add comprehensive error handling to all pipeline components with proper logging",
+            "dependencies": [
+              "22.1",
+              "22.2"
+            ],
+            "details": "Wrap all API calls, file operations, and data processing with try-catch blocks. Implement structured logging with error context (lead ID, operation type, error details). Add error metrics collection for monitoring. Ensure proper cleanup of resources on failures.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Graceful Degradation for Batch Processing",
+            "description": "Ensure individual lead failures don't stop entire batch processing workflow",
+            "dependencies": [
+              "22.3"
+            ],
+            "details": "Implement per-lead error isolation so batch processing continues when individual leads fail. Add failed lead tracking and reporting. Create partial result handling for incomplete batches. Implement recovery mechanisms to retry failed leads in subsequent runs while preserving successful results.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "title": "Create Observability and Logging System",
+        "description": "Implement comprehensive logging and real-time progress monitoring for user feedback",
+        "details": "Build structured JSON logging system writing to agent.log file with timestamps, lead IDs, error details, and processing status. Implement tqdm progress bar showing: 'Processing Leads: 2%|██ | 105/5000 [00:10<07:55, 10.2 leads/s]'. Add final summary displaying: succeeded count, failed count, reference to log file. Include real-time logging of batch processing and API call status.",
+        "testStrategy": "Verify log file format and content, test progress bar accuracy and timing estimates, confirm summary statistics correctness",
+        "priority": "medium",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Structured JSON Logging System",
+            "description": "Create JSON-formatted logging system that writes to agent.log with timestamps, lead IDs, error details, and processing status",
+            "dependencies": [],
+            "details": "Set up structured logging with JSON format including fields: timestamp, lead_id, status, error_details, processing_stage. Configure log rotation and ensure thread-safe writing for concurrent operations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Build tqdm Progress Bar with Statistics",
+            "description": "Implement detailed progress bar showing processing rate, ETA, and completion percentage",
+            "dependencies": [
+              "23.1"
+            ],
+            "details": "Create tqdm progress bar displaying format: 'Processing Leads: X%|██ | current/total [elapsed<remaining, rate leads/s]'. Include dynamic updates for batch processing and accurate time estimates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Generate Final Summary Report",
+            "description": "Create end-of-processing summary with success/failure counts and log file reference",
+            "dependencies": [
+              "23.1",
+              "23.2"
+            ],
+            "details": "Display final summary including: total processed count, successful operations, failed operations, error breakdown by type, and reference to log file location for detailed review.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add Real-time Status Logging",
+            "description": "Implement live logging for batch processing and API call status updates",
+            "dependencies": [
+              "23.1"
+            ],
+            "details": "Create real-time logging for batch operations, API call status, rate limiting events, and error recovery attempts. Include structured logging for debugging and monitoring purposes.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "Implement Main Processing Pipeline Integration",
+        "description": "Create coordinated main script that orchestrates all components for complete lead processing workflow",
+        "details": "Build main() function that coordinates: configuration loading, input validation, chunked data processing, parallel Playwright rendering, batched AI analysis, email generation, and result writing. Ensure proper async/await handling for Playwright operations. Implement clean shutdown handling and resource cleanup. Create resumption detection at startup and proper state management throughout processing.",
+        "testStrategy": "End-to-end testing with sample gym CSV, verify all components work together, test resumption after interruption, validate complete workflow",
         "priority": "high",
         "dependencies": [
-          2,
-          3
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
         ],
-        "details": "Develop gym-specific pain scoring that considers: outdated gym management software, poor website performance, lack of mobile app, inefficient booking systems, poor member experience, limited payment options, lack of automation. Weight factors based on gym size and business model. Create RED/GREEN classification for gym leads.",
-        "testStrategy": "Test scoring with sample gym data, verify classification accuracy, test with different gym types and sizes.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Define gym-specific pain factors",
-            "description": "Identify key pain points specific to gym and fitness businesses",
-            "details": "Research gym pain points, define scoring factors, weight factors by importance",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 4
-          },
-          {
-            "id": 2,
-            "title": "Create gym size and model-specific scoring",
-            "description": "Develop scoring that adapts to different gym types and sizes",
-            "details": "Create scoring variations for small gyms, large chains, specialty studios, different business models",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 4
-          },
-          {
-            "id": 3,
-            "title": "Implement gym-specific RED/GREEN classification",
-            "description": "Create classification system specifically for gym leads",
-            "details": "Define RED/GREEN thresholds for gyms, implement classification logic, test with sample data",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 4
-          }
-        ]
+        "status": "pending",
+        "subtasks": []
       },
       {
-        "id": 5,
-        "title": "Gym Software Lead Qualification System",
-        "description": "Implement additional qualification criteria specific to gym software sales opportunities.",
-        "status": "pending",
+        "id": 25,
+        "title": "Create Documentation and Performance Optimization",
+        "description": "Generate comprehensive README with setup instructions and optimize performance to meet 20-second processing requirements",
+        "details": "Create detailed README.md with: installation steps including 'playwright install', .env setup with GROQ_API_KEY, usage examples, troubleshooting guide. Document .gitignore requirements for .env and *.csv files. Optimize performance to process 100 valid leads in under 20 seconds through: parallel Playwright workers, efficient batching, resource blocking, and async processing. Add performance monitoring and bottleneck identification.",
+        "testStrategy": "Test setup process from README instructions, benchmark processing speed with 100-lead test set, verify security practices documented and implemented",
         "priority": "medium",
         "dependencies": [
-          4
+          24
         ],
-        "details": "Add qualification criteria like: gym size (member count), revenue potential, current software contract status, decision maker identification, technology adoption readiness, growth indicators. Create lead scoring tiers (Hot, Warm, Cold) for gym software sales. Implement budget estimation based on gym characteristics.",
-        "testStrategy": "Test qualification with sample gym data, verify scoring tiers, test budget estimation accuracy.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement gym size and revenue qualification",
-            "description": "Qualify leads based on gym size and revenue potential",
-            "details": "Estimate gym size from available data, assess revenue potential, filter for viable prospects",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          },
-          {
-            "id": 2,
-            "title": "Create decision maker identification system",
-            "description": "Identify and qualify decision makers at gym businesses",
-            "details": "Analyze business data to identify owners, managers, decision makers, assess contact quality",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          },
-          {
-            "id": 3,
-            "title": "Develop budget estimation for gym software",
-            "description": "Estimate potential budget based on gym characteristics",
-            "details": "Create budget estimation model based on gym size, services, current software, market position",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Gym-Specific PDF Template Design",
-        "description": "Create specialized PDF template for gym software Pain-Gap Audits with gym-specific pain points and solutions.",
         "status": "pending",
-        "priority": "medium",
-        "dependencies": [],
-        "details": "Design gym-specific audit template highlighting: current software limitations, missed revenue opportunities, member experience gaps, operational inefficiencies, competitive disadvantages. Include gym-specific metrics and benchmarks. Create compelling value propositions for gym management software.",
-        "testStrategy": "Test template with sample gym data, verify gym-specific content relevance, test with different gym types.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Design gym-specific audit template",
-            "description": "Create template specifically designed for gym software audits",
-            "details": "Design layout with gym-specific sections, include relevant metrics, create compelling visual design",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 2,
-            "title": "Create gym-specific pain point analysis",
-            "description": "Develop analysis framework for gym-specific pain points",
-            "details": "Identify common gym pain points, create analysis methodology, develop solution recommendations",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 3,
-            "title": "Implement gym-specific value propositions",
-            "description": "Create compelling value propositions for gym management software",
-            "details": "Develop ROI calculations, efficiency gains, member experience improvements, competitive advantages",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 6
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Gym Software Market Research Integration",
-        "description": "Integrate market research data to enhance lead qualification and targeting for gym software sales.",
-        "status": "pending",
-        "priority": "medium",
-        "dependencies": [
-          5
-        ],
-        "details": "Research gym software market trends, competitor analysis, pricing benchmarks, feature comparisons. Integrate market data into lead scoring and qualification. Create competitive intelligence for sales team. Identify market opportunities and trends.",
-        "testStrategy": "Test market data integration, verify data accuracy, test impact on lead qualification.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Conduct gym software market research",
-            "description": "Research gym software market landscape and trends",
-            "details": "Analyze market size, growth trends, competitor landscape, pricing models, feature sets",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 7
-          },
-          {
-            "id": 2,
-            "title": "Create competitive intelligence system",
-            "description": "Build system to track gym software competitors and offerings",
-            "details": "Track competitor features, pricing, market positioning, strengths and weaknesses",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 7
-          },
-          {
-            "id": 3,
-            "title": "Integrate market data into lead scoring",
-            "description": "Incorporate market research into lead qualification process",
-            "details": "Use market data to enhance lead scoring, identify market opportunities, improve targeting",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 7
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Gym Software Sales Pipeline Integration",
-        "description": "Integrate gym software lead generation with sales pipeline and CRM systems.",
-        "status": "pending",
-        "priority": "medium",
-        "dependencies": [
-          6,
-          7
-        ],
-        "details": "Connect lead generation to CRM systems (Salesforce, HubSpot, etc.). Create automated lead routing and assignment. Implement lead nurturing workflows. Create sales team dashboards and reporting. Integrate with email marketing and follow-up systems.",
-        "testStrategy": "Test CRM integration, verify lead routing, test automated workflows, validate reporting accuracy.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement CRM system integration",
-            "description": "Connect gym software leads to CRM systems",
-            "details": "Integrate with Salesforce, HubSpot, or other CRM systems, create data mapping, test integration",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 8
-          },
-          {
-            "id": 2,
-            "title": "Create automated lead routing system",
-            "description": "Implement automated lead assignment and routing",
-            "details": "Create lead routing rules, assign leads to appropriate sales reps, implement follow-up workflows",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 8
-          },
-          {
-            "id": 3,
-            "title": "Develop sales team dashboards",
-            "description": "Create dashboards for sales team to track gym software leads",
-            "details": "Build lead tracking dashboards, create performance metrics, implement reporting systems",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 8
-          }
-        ]
-      },
-      {
-        "id": 9,
-        "title": "Gym Software Lead Nurturing System",
-        "description": "Create automated lead nurturing system specifically designed for gym software sales cycle.",
-        "status": "pending",
-        "priority": "medium",
-        "dependencies": [
-          8
-        ],
-        "details": "Develop email sequences for gym software leads. Create educational content about gym management software benefits. Implement follow-up scheduling and reminders. Create lead scoring updates based on engagement. Design multi-touch nurturing campaigns.",
-        "testStrategy": "Test email sequences, verify engagement tracking, test lead scoring updates, validate nurturing effectiveness.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create gym software email sequences",
-            "description": "Develop email nurturing sequences for gym software leads",
-            "details": "Create educational email series, case studies, ROI calculators, feature comparisons",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 9
-          },
-          {
-            "id": 2,
-            "title": "Implement engagement tracking system",
-            "description": "Track lead engagement and update scoring accordingly",
-            "details": "Track email opens, clicks, website visits, content downloads, update lead scores",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 9
-          },
-          {
-            "id": 3,
-            "title": "Design multi-touch nurturing campaigns",
-            "description": "Create comprehensive nurturing campaigns for gym software leads",
-            "details": "Design multi-channel campaigns, create touchpoint strategies, implement conversion tracking",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 9
-          }
-        ]
-      },
-      {
-        "id": 10,
-        "title": "Gym Software ROI Calculator",
-        "description": "Create specialized ROI calculator for gym management software to support sales conversations.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          6
-        ],
-        "details": "Develop ROI calculator that considers: membership growth potential, operational efficiency gains, staff time savings, revenue per member increases, member retention improvements, marketing automation benefits. Create customizable calculations based on gym size and type.",
-        "testStrategy": "Test ROI calculator with sample gym data, verify calculation accuracy, test with different gym scenarios.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Develop gym software ROI calculation model",
-            "description": "Create mathematical model for gym software ROI calculations",
-            "details": "Define ROI factors, create calculation formulas, build customizable model",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 10
-          },
-          {
-            "id": 2,
-            "title": "Create gym-specific ROI scenarios",
-            "description": "Develop ROI scenarios for different gym types and sizes",
-            "details": "Create scenarios for small gyms, large chains, specialty studios, different business models",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 10
-          },
-          {
-            "id": 3,
-            "title": "Build interactive ROI calculator interface",
-            "description": "Create user-friendly interface for ROI calculations",
-            "details": "Design calculator interface, create input forms, build results display, add export functionality",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 10
-          }
-        ]
-      },
-      {
-        "id": 11,
-        "title": "Gym Software Case Study Generator",
-        "description": "Create automated system to generate gym software case studies and success stories.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          10
-        ],
-        "details": "Develop system to create case studies based on gym characteristics and pain points. Generate success stories with specific metrics and outcomes. Create industry-specific case studies for different gym types. Automate case study personalization for sales conversations.",
-        "testStrategy": "Test case study generation, verify content quality, test personalization accuracy.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create case study template system",
-            "description": "Develop templates for gym software case studies",
-            "details": "Create case study templates, define success metrics, build story frameworks",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 11
-          },
-          {
-            "id": 2,
-            "title": "Implement case study personalization",
-            "description": "Create system to personalize case studies for specific gyms",
-            "details": "Match case studies to gym characteristics, personalize content, create relevant examples",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 11
-          },
-          {
-            "id": 3,
-            "title": "Build case study generation automation",
-            "description": "Automate case study creation and delivery",
-            "details": "Create automated generation system, integrate with sales process, implement delivery workflows",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 11
-          }
-        ]
-      },
-      {
-        "id": 12,
-        "title": "Gym Software Competitive Analysis System",
-        "description": "Create automated system to analyze and track gym software competitors and market positioning.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          7
-        ],
-        "details": "Develop system to track competitor features, pricing, market share, customer reviews, and positioning. Create competitive intelligence reports. Monitor competitor marketing activities and messaging. Provide competitive insights for sales team.",
-        "testStrategy": "Test competitive analysis system, verify data accuracy, test reporting functionality.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Build competitor tracking system",
-            "description": "Create system to track gym software competitors",
-            "details": "Monitor competitor websites, pricing, features, marketing activities, customer reviews",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 12
-          },
-          {
-            "id": 2,
-            "title": "Create competitive intelligence reports",
-            "description": "Generate reports on competitor analysis and market positioning",
-            "details": "Create regular reports, analyze trends, identify opportunities, track market changes",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 12
-          },
-          {
-            "id": 3,
-            "title": "Implement competitive insights for sales",
-            "description": "Provide competitive insights to support sales conversations",
-            "details": "Create sales enablement materials, develop competitive positioning, train sales team",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 12
-          }
-        ]
-      },
-      {
-        "id": 13,
-        "title": "Gym Software Lead Analytics and Reporting",
-        "description": "Create comprehensive analytics and reporting system for gym software lead generation performance.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          8,
-          9
-        ],
-        "details": "Develop dashboards to track lead generation metrics, conversion rates, sales pipeline performance, ROI by lead source, and campaign effectiveness. Create automated reporting for management and sales team. Implement predictive analytics for lead quality.",
-        "testStrategy": "Test analytics system, verify data accuracy, test reporting functionality, validate predictive models.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create lead generation analytics dashboard",
-            "description": "Build dashboard to track gym software lead generation metrics",
-            "details": "Track lead volume, quality scores, conversion rates, source performance, campaign effectiveness",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 13
-          },
-          {
-            "id": 2,
-            "title": "Implement sales pipeline reporting",
-            "description": "Create reporting system for gym software sales pipeline",
-            "details": "Track pipeline stages, conversion rates, sales velocity, revenue forecasting, performance metrics",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 13
-          },
-          {
-            "id": 3,
-            "title": "Develop predictive analytics for lead quality",
-            "description": "Create predictive models for gym software lead quality and conversion likelihood",
-            "details": "Build machine learning models, analyze historical data, predict lead success probability",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 13
-          }
-        ]
-      },
-      {
-        "id": 14,
-        "title": "Gym Software Sales Training and Enablement",
-        "description": "Create training materials and sales enablement tools for gym software sales team.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          11,
-          12
-        ],
-        "details": "Develop sales training materials specific to gym software sales. Create objection handling guides, demo scripts, and presentation templates. Build sales playbooks for different gym types and scenarios. Implement sales coaching and performance tracking.",
-        "testStrategy": "Test training materials with sales team, verify effectiveness, test sales enablement tools.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create gym software sales training materials",
-            "description": "Develop comprehensive training materials for gym software sales",
-            "details": "Create training modules, product knowledge guides, sales techniques, objection handling",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 14
-          },
-          {
-            "id": 2,
-            "title": "Build sales enablement tools",
-            "description": "Create tools to support gym software sales process",
-            "details": "Create demo scripts, presentation templates, objection handling guides, sales playbooks",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 14
-          },
-          {
-            "id": 3,
-            "title": "Implement sales performance tracking",
-            "description": "Create system to track and improve sales team performance",
-            "details": "Track sales metrics, implement coaching programs, create performance improvement plans",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 14
-          }
-        ]
-      },
-      {
-        "id": 15,
-        "title": "Gym Software Lead Generation Optimization",
-        "description": "Continuously optimize the gym software lead generation system based on performance data and market feedback.",
-        "status": "pending",
-        "priority": "low",
-        "dependencies": [
-          13,
-          14
-        ],
-        "details": "Analyze lead generation performance data to identify optimization opportunities. A/B test different approaches and messaging. Optimize targeting criteria and scoring algorithms. Implement feedback loops from sales team. Continuously improve lead quality and conversion rates.",
-        "testStrategy": "Test optimization strategies, verify performance improvements, test new approaches, validate results.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement A/B testing for lead generation",
-            "description": "Create A/B testing framework for gym software lead generation",
-            "details": "Test different approaches, messaging, targeting criteria, scoring algorithms",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 15
-          },
-          {
-            "id": 2,
-            "title": "Create feedback loops from sales team",
-            "description": "Implement system to gather feedback from sales team on lead quality",
-            "details": "Create feedback collection system, analyze sales team input, improve lead quality",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 15
-          },
-          {
-            "id": 3,
-            "title": "Optimize targeting and scoring algorithms",
-            "description": "Continuously improve targeting criteria and scoring algorithms",
-            "details": "Analyze performance data, optimize algorithms, improve targeting precision, enhance scoring accuracy",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 15
-          }
-        ]
+        "subtasks": []
       }
     ],
     "metadata": {
-      "projectName": "Gym Management Software Lead Generation System",
-      "version": "1.0",
       "created": "2025-07-22T20:49:04.882Z",
-      "updated": "2025-07-23T22:21:18.798Z",
-      "description": "Gym Management Software Lead Generation System - Retrofitting Pain-Gap Audit for gym and fitness businesses"
+      "updated": "2025-09-24T16:31:18.358Z",
+      "description": "Tasks for gym-software-leads context"
     }
   }
 }

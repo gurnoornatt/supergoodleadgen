@@ -117,3 +117,107 @@ python main.py --config config.json
 - Data validation at each step
 - Logging and monitoring throughout
 - Backup and recovery procedures
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md
+
+## Taskmaster Development Workflow & Hygiene
+
+**CRITICAL**: Always practice good Taskmaster hygiene by properly updating task status throughout development.
+
+### Essential Taskmaster Commands for Daily Development
+
+#### Project Status & Navigation
+```bash
+taskmaster list                           # Show all tasks with current status
+taskmaster list --with-subtasks          # Include subtasks in listing
+taskmaster next                           # Get next available task to work on
+taskmaster show <id>                      # View detailed task information (e.g., taskmaster show 16.1)
+```
+
+#### Task Status Management (CRITICAL FOR HYGIENE)
+```bash
+# BEFORE starting work on any task/subtask
+taskmaster set-status --id=<id> --status=in-progress
+
+# AFTER completing any task/subtask
+taskmaster set-status --id=<id> --status=done
+
+# Other status options
+taskmaster set-status --id=<id> --status=pending    # Reset to pending
+taskmaster set-status --id=<id> --status=deferred   # Postpone
+taskmaster set-status --id=<id> --status=cancelled  # No longer needed
+```
+
+#### Task Management & Updates
+```bash
+taskmaster add-task --prompt="description" --research        # Add new task with AI assistance
+taskmaster update-task --id=<id> --prompt="changes"          # Update specific task with new info
+taskmaster update-subtask --id=<id> --prompt="notes"         # Add implementation notes to subtask
+taskmaster update --from=<id> --prompt="changes"             # Update multiple tasks from ID onwards
+```
+
+#### Task Organization
+```bash
+taskmaster expand --id=<id> --research --force              # Break task into subtasks
+taskmaster add-dependency --id=<id> --depends-on=<id>       # Add task dependency
+taskmaster remove-dependency --id=<id> --depends-on=<id>    # Remove dependency
+taskmaster validate-dependencies                            # Check for dependency issues
+```
+
+### Mandatory Taskmaster Hygiene Practices
+
+#### 1. Status Updates Are REQUIRED
+- **ALWAYS** mark task as `in-progress` before starting work
+- **ALWAYS** mark task as `done` immediately after completion
+- **NEVER** leave tasks in wrong status - this breaks dependency chains
+- Update subtasks individually as you complete them
+
+#### 2. Implementation Logging
+- Use `update-subtask` to log what you learned during implementation
+- Document any blockers, changes, or discoveries
+- Add notes about what worked vs what didn't work
+
+#### 3. Dependency Management
+- Check `taskmaster next` before starting new work
+- Never work on tasks with unmet dependencies
+- Use `validate-dependencies` if dependency chain seems broken
+
+#### 4. Progress Tracking
+- Run `taskmaster list` regularly to see overall progress
+- Use `--with-subtasks` to see detailed breakdown
+- Check completion percentages in dashboard
+
+### Workflow Example for AI Sales Intelligence Agent
+
+```bash
+# 1. Check what to work on next
+taskmaster next
+
+# 2. View task details
+taskmaster show 16.1
+
+# 3. Mark as in-progress BEFORE starting
+taskmaster set-status --id=16.1 --status=in-progress
+
+# 4. Do the implementation work...
+# [implement the actual code]
+
+# 5. Log implementation notes
+taskmaster update-subtask --id=16.1 --prompt="Installed langchain-core==0.3.15, langchain-groq==0.2.8, playwright==1.45.0, pandas==2.1.4, tqdm==4.66.1, python-dotenv==1.0.0. All packages installed successfully. Created requirements.txt with pinned versions. Tested imports - all working."
+
+# 6. Mark as done IMMEDIATELY after completion
+taskmaster set-status --id=16.1 --status=done
+
+# 7. Check next available task
+taskmaster next
+```
+
+### Current Project Status
+
+**Project**: AI Sales Intelligence Agent (Tag: gym-software-leads)
+**Total Tasks**: 10 main tasks, 31+ subtasks
+**Current Priority**: Task 16.1 - Install Dependencies and Create Requirements File
+
+**Remember**: The Taskmaster system tracks all your progress and maintains proper dependency ordering. Following this hygiene ensures the project moves forward systematically and nothing gets forgotten or blocked.

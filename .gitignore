@@ -170,3 +170,9 @@ leads_*.csv
 *.bak
 *.backup
 *~
+
+# Environment variables
+
+# Task files
+# tasks.json
+# tasks/ 

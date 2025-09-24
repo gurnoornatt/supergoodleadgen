@@ -1,0 +1,158 @@
+PRD: AI Sales Intelligence Agent
+Version: 1.0 (Titan)
+
+Date: September 23, 2025
+
+Status: FINAL - Approved for Development
+
+Owner: Sales Operations
+
+1. Vision & Executive Summary
+The core mission of this project is to build a high-performance, resilient command-line tool that acts as a force multiplier for our sales team. By automating the entire top-of-funnel research and outreach process, we will transform our Sales Development Representatives (SDRs) from manual researchers into strategic closers. This document outlines the v1.0 agent, which will read a list of gym leads, perform deep analysis of their web presence using a headless browser and AI, and generate hyper-personalized sales emails. This tool is the cornerstone of our strategy to scale outbound sales efficiently and effectively.
+
+2. Background & Problem Statement
+Currently, an SDR spends approximately 15 hours per week (~35% of their time) on manual lead qualification. This involves visiting each prospect's website, attempting to identify operational weaknesses (e.g., lack of online booking), and crafting a personalized email. This process is slow, prone to inconsistency, and fundamentally unscalable. As a result, our lead engagement speed is slow, and our total addressable market outreach is capped by headcount. This tool is designed to solve this problem by fully automating the research and drafting phases.
+
+3. Goals & Success Metrics
+3.1. Business Goals
+Increase the volume and quality of outbound sales opportunities.
+
+Improve the efficiency and job satisfaction of the sales team by eliminating tedious tasks.
+
+3.2. User Goals
+For Alex, the SDR: To receive a fully enriched list of leads with a high-quality, ready-to-send email draft for every viable prospect, allowing them to focus entirely on communication and relationship building.
+
+3.3. Technical Goals
+To build a reliable, performant, and observable data processing application that is easy to maintain and run.
+
+3.4. Success Metrics
+Primary (Business Impact): Achieve a >15% increase in the positive reply rate for agent-generated emails compared to the historical baseline.
+
+Secondary (Efficiency): Reduce the time-to-first-outreach for a new 1,000-lead list from ~20 hours of manual work to under 10 minutes of script execution.
+
+Operational (Reliability): Achieve a >99% successful processing rate for a given list of valid leads (i.e., leads with working websites).
+
+4. User Scenario: Alex's Workflow
+Setup: Alex receives a new list of 5,000 gym leads in a leads_new.csv file.
+
+Configuration: In their terminal, Alex places the CSV in the project directory. They've already set their GROQ_API_KEY in a .env file once, so no further setup is needed.
+
+Execution: Alex runs the command: python main.py --input leads_new.csv --output leads_processed.csv.
+
+Observation: The terminal immediately displays a progress bar: Processing Leads: 2%|██ | 105/5000 [00:10<07:55, 10.2 leads/s]. Alex can see it's working and can estimate it will be done in about 8 minutes.
+
+Interruption: Alex's laptop restarts unexpectedly.
+
+Resumption: After rebooting, Alex runs the exact same command again. The terminal shows a message: Output file found. Resuming from lead #2,347... and the progress bar picks up where it left off.
+
+Completion: The script finishes and prints a summary: Processing complete. Succeeded: 4,890. Failed: 110. See agent.log for details.
+
+Result: Alex opens leads_processed.csv and now has columns for analysis_json and generated_email, ready to be uploaded to their sales engagement platform.
+
+5. Technical Architecture & System Design
+The application will be a monolithic Python script that follows a chunk-based, sequential processing flow with parallel operations within each chunk.
+
+5.1. System Components
+Configuration Manager: Handles loading of API keys and parsing of command-line arguments.
+
+Data I/O & Chunker: Reads the input CSV, validates it, and yields data in manageable chunks. Manages writing results back to the output CSV.
+
+State Manager: Implements the checkpointing/resuming logic by cross-referencing the input and output files on startup.
+
+Web Content Renderer: A pool of Playwright workers responsible for fetching and rendering JavaScript-heavy websites.
+
+AI Agent Orchestrator: Manages the two-phase LangChain logic, including prompt formatting and making batched, asynchronous calls to the Groq API.
+
+Observer: Provides real-time feedback to the user via the console (tqdm) and detailed structured logs for debugging (agent.log).
+
+5.2. Technology Stack & Sources
+Language: Python 3.11+
+
+AI Orchestration: LangChain (langchain-core, langchain-groq)
+
+Source: https://python.langchain.com/
+
+LLM Provider: Groq API
+
+Source: https://console.groq.com/docs/sdks
+
+LLM Model: meta-llama/llama-4-scout-17b-16e-instruct
+
+Web Rendering: Playwright for Python
+
+Source: https://playwright.dev/python/docs/intro
+
+Data Handling: Pandas
+
+Source: https://pandas.pydata.org/docs/
+
+Concurrency: asyncio
+
+Source: https://docs.python.org/3/library/asyncio.html
+
+Dependencies: python-dotenv, argparse, tqdm
+
+6. Detailed Feature Requirements
+6.1. Configuration & Setup (Feature 1)
+REQ 1.1: A requirements.txt file MUST be provided.
+
+REQ 1.2: A README.md MUST detail setup, dependencies (including Playwright's browser installation via playwright install), and usage examples.
+
+REQ 1.3: The script MUST load GROQ_API_KEY from a .env file or environment variables.
+
+REQ 1.4: The script MUST accept --input and --output arguments.
+
+6.2. Data I/O & State Management (Feature 2)
+REQ 2.1 (Validation): On startup, the script MUST validate that the input CSV contains gym_name and website_url columns. If not, it will terminate with an error.
+
+REQ 2.2 (Chunking): The input DataFrame MUST be processed in chunks of 200 rows.
+
+REQ 2.3 (Resuming): The script MUST implement the resumption logic described in the user scenario by comparing website_url values between the input and existing output files.
+
+REQ 2.4 (Output Columns): The output CSV MUST contain the original columns plus status (e.g., "Success", "Error"), error_message, analysis_json, and generated_email.
+
+6.3. Web Content Rendering (Feature 3)
+REQ 3.1 (Playwright): The script MUST use Playwright's async API to render website content.
+
+REQ 3.2 (Efficiency): To improve speed, Playwright requests SHOULD be configured to block non-essential resources like images and CSS stylesheets.
+
+REQ 3.3 (Timeout): The page load MUST have a navigation timeout of 15 seconds.
+
+6.4. AI Agent Orchestration (Feature 4)
+REQ 4.1 (Batching): All Groq API calls MUST use the abatch() method on the LangChain client.
+
+Source: https://python.langchain.com/docs/how_to/chat_models_universal_init/
+
+REQ 4.2 (Analysis Agent Prompt): The prompt must be structured as follows:
+
+"You are a precise data extraction bot. Analyze the provided website HTML content. Respond ONLY with a valid JSON object matching this exact schema: {\"has_online_booking\": boolean, \"has_online_membership_sales\": boolean, \"uses_generic_contact_form\": boolean, \"mentions_24_7_access\": boolean, \"has_member_portal\": boolean}. Do not include any explanatory text. Website Content: {html_content}"
+
+REQ 4.3 (Email Agent Prompt): The prompt must be structured as follows:
+
+"You are a helpful sales assistant for a Gym Operating System company. Your goal is to write a brief, friendly, and compelling sales email under 150 words to the gym owner. Use the provided analysis to connect one of their specific operational weaknesses to a feature of our software. End with a clear call to action. Gym Name: {gym_name}. Analysis: {analysis_json}"
+
+6.5. Error Handling & Observability (Feature 5 & 6)
+REQ 5.1 (Error Handling): The script MUST implement the resilience strategies outlined in the table below.
+| Error Type | Example | Behavior |
+| :--- | :--- | :--- |
+| Non-Recoverable | Website 404, Playwright Timeout | Log error, write status to CSV, continue. |
+| Recoverable | Groq API 503, Network Timeout | Retry up to 3 times with exponential backoff. |
+| Validation | Malformed JSON from LLM | Retry analysis for that lead up to 2 times. |
+
+REQ 6.1 (Structured Logging): Logs MUST be written to agent.log in JSON format.
+
+REQ 6.2 (Console Output): A tqdm progress bar MUST display real-time progress. A final summary MUST be printed on completion.
+
+6.6. Performance & Security
+REQ 7.1 (Performance): The script must process a chunk of 100 valid leads in under 20 seconds.
+
+REQ 8.1 (Security): The README.md must instruct users to add .env and *.csv to their .gitignore file to prevent committing secrets and sensitive lead data.
+
+7. Out of Scope for v1.0
+A graphical user interface (GUI).
+
+Direct email sending capabilities.
+
+Support for input formats other than CSV.
+
+Use of a persistent database for results.
