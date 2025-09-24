@@ -139,8 +139,37 @@ Thumbs.db
 # Cursor
 .cursor/
 
-# Generated data and output files
-*.csv
+# AI Assistant Files
+.claude/
+.cursor/
+.gemini/
+.kilo/
+.kiro/
+.roo/
+.trae/
+.windsurf/
+.zed/
+.clinerules/
+.rules
+.roomodes
+.kilocodemodes
+opencode.json
+
+# Generated data and output files (keep structure, ignore content)
+data/raw/*.csv
+data/raw/*.json
+data/processed/*.csv
+data/output/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/output/.gitkeep
+
+# Archive and temporary directories
+archive/
+temp/
+legacy/
+
+# Media files
 *.png
 *.jpg
 *.jpeg
@@ -151,6 +180,8 @@ Thumbs.db
 screenshots/
 cloud_screenshots/
 validation_reports/
+
+# Generated output files
 *.output.*
 *_output.*
 *_test.*
@@ -161,9 +192,6 @@ final_*.csv
 rigorous_*.csv
 leads_*.csv
 
-# Taskmaster generated files (keep config but ignore state)
-.taskmaster/state.json
-
 # Temporary files
 *.tmp
 *.temp
@@ -171,8 +199,13 @@ leads_*.csv
 *.backup
 *~
 
-# Environment variables
+# Sensitive data
+.env.backup
+*.key
+*.pem
+secrets/
 
-# Task files
-# tasks.json
-# tasks/ 
+# Playwright specific
+.playwright-mcp/
+test-results/
+playwright-report/ 
